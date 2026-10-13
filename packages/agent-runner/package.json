@@ -1,0 +1,11 @@
+{
+  "version": "0.1.0",
+  "name": "@arena/agent-runner",
+  "exports": "./src/index.ts",
+  "private": true,
+  "dependencies": {
+    "@arena/arena-core": "workspace:*",
+    "@modelcontextprotocol/sdk": "1.32.1"
+  },
+  "type": "module"
+}

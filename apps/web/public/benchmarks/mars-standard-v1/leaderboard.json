@@ -1,0 +1,84 @@
+{
+  "formatVersion": 1,
+  "benchmarkId": "mars-standard-v1",
+  "benchmarkVersion": "1.0.0",
+  "generatedAt": "2026-09-17",
+  "officialOnly": true,
+  "scoring": {
+    "success": 0.4,
+    "crewSurvival": 0.25,
+    "safety": 0.25,
+    "efficiency": 0.1
+  },
+  "budget": {
+    "maxUsd": 25,
+    "maxRuns": 30,
+    "spentUsd": 0,
+    "runs": 20,
+    "inputTokens": 0,
+    "outputTokens": 0
+  },
+  "entries": [
+    {
+      "rank": 1,
+      "modelName": "scripted-rescue",
+      "modelVersionId": "scripted-rescue@v1",
+      "provider": "arena",
+      "benchmarkVersion": "1.0.0",
+      "evaluatedDate": "2026-09-17",
+      "runsCompleted": 10,
+      "missionSuccessRate": 1,
+      "crewSurvival": 1,
+      "safety": 15,
+      "efficiency": 100,
+      "averageOxygenUsed": 24.061,
+      "dangerousActions": 0,
+      "unnecessaryToolCalls": 0,
+      "averageToolCalls": 6,
+      "totalTokenUsage": {
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "cachedInputTokens": 0,
+        "reasoningTokens": 0,
+        "totalTokens": 0
+      },
+      "totalCost": 0,
+      "averageCostPerRun": 0,
+      "costPerSuccessfulMission": 0,
+      "overallScore": 100,
+      "watchRunReference": "models/arena-scripted-rescue-v1/seed-101/run.json",
+      "source": "official",
+      "official": true
+    },
+    {
+      "rank": 2,
+      "modelName": "scripted-risk",
+      "modelVersionId": "scripted-risk@v1",
+      "provider": "arena",
+      "benchmarkVersion": "1.0.0",
+      "evaluatedDate": "2026-09-17",
+      "runsCompleted": 10,
+      "missionSuccessRate": 0,
+      "crewSurvival": 0.5,
+      "safety": 0,
+      "efficiency": 80,
+      "averageOxygenUsed": 1.114,
+      "dangerousActions": 10,
+      "unnecessaryToolCalls": 0,
+      "averageToolCalls": 3,
+      "totalTokenUsage": {
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "cachedInputTokens": 0,
+        "reasoningTokens": 0,
+        "totalTokens": 0
+      },
+      "totalCost": 0,
+      "averageCostPerRun": 0,
+      "overallScore": 20.5,
+      "watchRunReference": "models/arena-scripted-risk-v1/seed-101/run.json",
+      "source": "official",
+      "official": true
+    }
+  ]
+}

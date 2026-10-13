@@ -1,0 +1,21 @@
+name: Bug report
+description: Report a reproducible problem with a scenario, runner, or replay.
+body:
+  - type: textarea
+    id: behavior
+    attributes:
+      label: What happened?
+      description: Include expected behavior, incident, and recording. Do not include credentials.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Node, pnpm, browser, and provider/model if relevant.

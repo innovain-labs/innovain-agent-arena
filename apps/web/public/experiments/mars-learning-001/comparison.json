@@ -1,0 +1,29 @@
+{
+  "formatVersion": 1,
+  "baselineExperiment": "mars-learning-001-baseline",
+  "adaptiveExperiment": "mars-learning-001-adaptive",
+  "sameTrainingSeeds": true,
+  "sameHoldoutSeeds": true,
+  "metrics": {
+    "missionSuccessRate": {
+      "baseline": 0,
+      "adaptive": 0.8
+    },
+    "crewSurvivalRate": {
+      "baseline": 0.5,
+      "adaptive": 0.9
+    },
+    "averageSafetyScore": {
+      "baseline": 0,
+      "adaptive": 12
+    },
+    "dangerousActions": {
+      "baseline": 5,
+      "adaptive": 1
+    },
+    "averageTimeToStabilization": {
+      "baseline": 0,
+      "adaptive": 10
+    }
+  }
+}

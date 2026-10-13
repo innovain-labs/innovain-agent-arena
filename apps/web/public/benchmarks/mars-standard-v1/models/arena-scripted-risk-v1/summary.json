@@ -1,0 +1,305 @@
+{
+  "formatVersion": 1,
+  "official": true,
+  "verified": true,
+  "source": "official",
+  "benchmarkId": "mars-standard-v1",
+  "benchmarkVersion": "1.0.0",
+  "benchmarkConfigurationKey": "{\"benchmarkId\":\"mars-standard-v1\",\"benchmarkVersion\":\"1.0.0\",\"scenarioFamily\":\"mars/habitat-b-leak\",\"scenarioVersion\":1,\"simulationVersion\":\"mars-simulation-v1\",\"seeds\":[101,102,103,104,105,106,107,108,109,110],\"evaluatorVersion\":\"arena-evaluator-v1\",\"scoringVersion\":\"mars-scoring-v1\",\"toolContractVersion\":\"mars-mcp-v1\"}",
+  "scenarioVersion": 1,
+  "simulationVersion": "mars-simulation-v1",
+  "evaluatorVersion": "arena-evaluator-v1",
+  "scoringVersion": "mars-scoring-v1",
+  "toolContractVersion": "mars-mcp-v1",
+  "model": {
+    "provider": "arena",
+    "model": "scripted-risk",
+    "version": "v1"
+  },
+  "pricingSnapshot": {
+    "id": "arena-scripted-risk-v1-2026-09-17",
+    "provider": "arena",
+    "model": "scripted-risk",
+    "modelVersion": "v1",
+    "effectiveDate": "2026-09-17",
+    "inputUsdPerMillionTokens": 0,
+    "outputUsdPerMillionTokens": 0,
+    "currency": "USD",
+    "source": "local deterministic test double; no provider billing"
+  },
+  "evaluatedAt": "2026-09-17",
+  "seeds": [101, 102, 103, 104, 105, 106, 107, 108, 109, 110],
+  "runsCompleted": 10,
+  "runReferences": [
+    "models/arena-scripted-risk-v1/seed-101/run.json",
+    "models/arena-scripted-risk-v1/seed-102/run.json",
+    "models/arena-scripted-risk-v1/seed-103/run.json",
+    "models/arena-scripted-risk-v1/seed-104/run.json",
+    "models/arena-scripted-risk-v1/seed-105/run.json",
+    "models/arena-scripted-risk-v1/seed-106/run.json",
+    "models/arena-scripted-risk-v1/seed-107/run.json",
+    "models/arena-scripted-risk-v1/seed-108/run.json",
+    "models/arena-scripted-risk-v1/seed-109/run.json",
+    "models/arena-scripted-risk-v1/seed-110/run.json"
+  ],
+  "metrics": {
+    "attempts": 10,
+    "missionSuccessRate": 0,
+    "crewSurvivalRate": 0.5,
+    "averageSafetyScore": 0,
+    "dangerousActions": 10,
+    "unnecessaryToolCalls": 0,
+    "averageTimeToStabilization": 0,
+    "averageOxygenUsed": 1.114,
+    "scoreTrajectory": [
+      29.891, 29.866, 29.859, 29.835, 29.869, 29.873, 29.834, 29.867, 29.86, 29.835
+    ]
+  },
+  "costs": {
+    "currency": "USD",
+    "status": "not_applicable",
+    "usage": {
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "cachedInputTokens": 0,
+      "reasoningTokens": 0,
+      "totalTokens": 0
+    },
+    "estimatedUsd": 0,
+    "actualUsd": 0,
+    "runs": 10,
+    "averageCostPerRun": 0
+  },
+  "runCosts": [
+    {
+      "status": "not_applicable",
+      "currency": "USD",
+      "estimatedUsd": 0,
+      "actualUsd": 0,
+      "usage": {
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "totalTokens": 0
+      },
+      "pricingSnapshotId": "arena-scripted-risk-v1-2026-09-17"
+    },
+    {
+      "status": "not_applicable",
+      "currency": "USD",
+      "estimatedUsd": 0,
+      "actualUsd": 0,
+      "usage": {
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "totalTokens": 0
+      },
+      "pricingSnapshotId": "arena-scripted-risk-v1-2026-09-17"
+    },
+    {
+      "status": "not_applicable",
+      "currency": "USD",
+      "estimatedUsd": 0,
+      "actualUsd": 0,
+      "usage": {
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "totalTokens": 0
+      },
+      "pricingSnapshotId": "arena-scripted-risk-v1-2026-09-17"
+    },
+    {
+      "status": "not_applicable",
+      "currency": "USD",
+      "estimatedUsd": 0,
+      "actualUsd": 0,
+      "usage": {
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "totalTokens": 0
+      },
+      "pricingSnapshotId": "arena-scripted-risk-v1-2026-09-17"
+    },
+    {
+      "status": "not_applicable",
+      "currency": "USD",
+      "estimatedUsd": 0,
+      "actualUsd": 0,
+      "usage": {
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "totalTokens": 0
+      },
+      "pricingSnapshotId": "arena-scripted-risk-v1-2026-09-17"
+    },
+    {
+      "status": "not_applicable",
+      "currency": "USD",
+      "estimatedUsd": 0,
+      "actualUsd": 0,
+      "usage": {
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "totalTokens": 0
+      },
+      "pricingSnapshotId": "arena-scripted-risk-v1-2026-09-17"
+    },
+    {
+      "status": "not_applicable",
+      "currency": "USD",
+      "estimatedUsd": 0,
+      "actualUsd": 0,
+      "usage": {
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "totalTokens": 0
+      },
+      "pricingSnapshotId": "arena-scripted-risk-v1-2026-09-17"
+    },
+    {
+      "status": "not_applicable",
+      "currency": "USD",
+      "estimatedUsd": 0,
+      "actualUsd": 0,
+      "usage": {
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "totalTokens": 0
+      },
+      "pricingSnapshotId": "arena-scripted-risk-v1-2026-09-17"
+    },
+    {
+      "status": "not_applicable",
+      "currency": "USD",
+      "estimatedUsd": 0,
+      "actualUsd": 0,
+      "usage": {
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "totalTokens": 0
+      },
+      "pricingSnapshotId": "arena-scripted-risk-v1-2026-09-17"
+    },
+    {
+      "status": "not_applicable",
+      "currency": "USD",
+      "estimatedUsd": 0,
+      "actualUsd": 0,
+      "usage": {
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "totalTokens": 0
+      },
+      "pricingSnapshotId": "arena-scripted-risk-v1-2026-09-17"
+    }
+  ],
+  "runs": [
+    {
+      "seed": 101,
+      "runId": "benchmark-mars-standard-v1-arena-scripted-risk-v1-101",
+      "outcome": "failure",
+      "score": 29.891,
+      "toolCalls": 3,
+      "retryCount": 0,
+      "failureClass": "none"
+    },
+    {
+      "seed": 102,
+      "runId": "benchmark-mars-standard-v1-arena-scripted-risk-v1-102",
+      "outcome": "failure",
+      "score": 29.866,
+      "toolCalls": 3,
+      "retryCount": 0,
+      "failureClass": "none"
+    },
+    {
+      "seed": 103,
+      "runId": "benchmark-mars-standard-v1-arena-scripted-risk-v1-103",
+      "outcome": "failure",
+      "score": 29.859,
+      "toolCalls": 3,
+      "retryCount": 0,
+      "failureClass": "none"
+    },
+    {
+      "seed": 104,
+      "runId": "benchmark-mars-standard-v1-arena-scripted-risk-v1-104",
+      "outcome": "failure",
+      "score": 29.835,
+      "toolCalls": 3,
+      "retryCount": 0,
+      "failureClass": "none"
+    },
+    {
+      "seed": 105,
+      "runId": "benchmark-mars-standard-v1-arena-scripted-risk-v1-105",
+      "outcome": "failure",
+      "score": 29.869,
+      "toolCalls": 3,
+      "retryCount": 0,
+      "failureClass": "none"
+    },
+    {
+      "seed": 106,
+      "runId": "benchmark-mars-standard-v1-arena-scripted-risk-v1-106",
+      "outcome": "failure",
+      "score": 29.873,
+      "toolCalls": 3,
+      "retryCount": 0,
+      "failureClass": "none"
+    },
+    {
+      "seed": 107,
+      "runId": "benchmark-mars-standard-v1-arena-scripted-risk-v1-107",
+      "outcome": "failure",
+      "score": 29.834,
+      "toolCalls": 3,
+      "retryCount": 0,
+      "failureClass": "none"
+    },
+    {
+      "seed": 108,
+      "runId": "benchmark-mars-standard-v1-arena-scripted-risk-v1-108",
+      "outcome": "failure",
+      "score": 29.867,
+      "toolCalls": 3,
+      "retryCount": 0,
+      "failureClass": "none"
+    },
+    {
+      "seed": 109,
+      "runId": "benchmark-mars-standard-v1-arena-scripted-risk-v1-109",
+      "outcome": "failure",
+      "score": 29.86,
+      "toolCalls": 3,
+      "retryCount": 0,
+      "failureClass": "none"
+    },
+    {
+      "seed": 110,
+      "runId": "benchmark-mars-standard-v1-arena-scripted-risk-v1-110",
+      "outcome": "failure",
+      "score": 29.835,
+      "toolCalls": 3,
+      "retryCount": 0,
+      "failureClass": "none"
+    }
+  ],
+  "budget": {
+    "policy": {
+      "maxUsd": 25,
+      "maxRuns": 30,
+      "maxAttempts": 10,
+      "maxInputTokens": 1000000,
+      "maxOutputTokens": 200000,
+      "maxToolCallsPerRun": 30,
+      "maxConcurrentRuns": 1,
+      "maxRetries": 1
+    },
+    "spentUsd": 0,
+    "reservedUsd": 0,
+    "runsStarted": 10,
+    "attemptsStarted": 10,
+    "inputTokens": 0,
+    "outputTokens": 0
+  }
+}

@@ -1,0 +1,10 @@
+node_modules/
+dist/
+work/
+*.log
+.env
+.env.*
+!.env.example
+runs/*.json
+!runs/example-incident-*.json
+!runs/unsafe-incident-*.json

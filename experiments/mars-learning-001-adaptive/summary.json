@@ -1,0 +1,318 @@
+{
+  "experimentId": "mars-learning-001-adaptive",
+  "name": "Mars Learning Experiment #001 / adaptive",
+  "world": "mars",
+  "scenarioFamily": "mars/habitat-b-leak",
+  "scenarioVersion": 1,
+  "agent": "Scripted adaptive test double",
+  "learningMode": "adaptive",
+  "maxAttempts": 5,
+  "trainingSeeds": [101, 102, 103, 104, 105],
+  "holdoutSeeds": [901, 902],
+  "attempts": [
+    {
+      "attempt": 1,
+      "seed": 101,
+      "split": "training",
+      "runId": "mars-learning-001-adaptive-attempt-001",
+      "outcome": "failure",
+      "score": 29.891,
+      "reflectionFile": "attempt-001/reflection.json",
+      "reflection": {
+        "version": 1,
+        "attempt": 1,
+        "runId": "mars-learning-001-adaptive-attempt-001",
+        "outcome": "failure",
+        "score": 29.891,
+        "whatWorked": [
+          "get_colony_status returned useful telemetry or changed the world.",
+          "inspect_habitat returned useful telemetry or changed the world.",
+          "open_external_airlock returned useful telemetry or changed the world."
+        ],
+        "whatFailed": ["Crew lost after habitat depressurization."],
+        "wrongAssumptions": [
+          "An irreversible action was taken before its safety consequences were resolved."
+        ],
+        "unnecessaryActions": [],
+        "dangerousActions": ["External airlock opened in Habitat B. Immediate decompression."],
+        "informationToGatherEarlier": ["Current pressure, crew location, and open transit paths."],
+        "strategyChanges": [
+          "Gather state before acting.",
+          "Avoid irreversible airlock or backup actions unless telemetry requires them."
+        ]
+      },
+      "strategyVersion": 2
+    },
+    {
+      "attempt": 2,
+      "seed": 102,
+      "split": "training",
+      "runId": "mars-learning-001-adaptive-attempt-002",
+      "outcome": "success",
+      "score": 95.526,
+      "reflectionFile": "attempt-002/reflection.json",
+      "reflection": {
+        "version": 1,
+        "attempt": 2,
+        "runId": "mars-learning-001-adaptive-attempt-002",
+        "outcome": "success",
+        "score": 95.526,
+        "whatWorked": [
+          "The mission reached a successful terminal state.",
+          "Tool calls were accepted by the MCP simulator."
+        ],
+        "whatFailed": [],
+        "wrongAssumptions": [],
+        "unnecessaryActions": [],
+        "dangerousActions": [],
+        "informationToGatherEarlier": [],
+        "strategyChanges": ["Keep the successful ordering, then test it on a new scenario variant."]
+      },
+      "strategyVersion": 3
+    },
+    {
+      "attempt": 3,
+      "seed": 103,
+      "split": "training",
+      "runId": "mars-learning-001-adaptive-attempt-003",
+      "outcome": "success",
+      "score": 95.842,
+      "reflectionFile": "attempt-003/reflection.json",
+      "reflection": {
+        "version": 1,
+        "attempt": 3,
+        "runId": "mars-learning-001-adaptive-attempt-003",
+        "outcome": "success",
+        "score": 95.842,
+        "whatWorked": [
+          "The mission reached a successful terminal state.",
+          "Tool calls were accepted by the MCP simulator."
+        ],
+        "whatFailed": [],
+        "wrongAssumptions": [],
+        "unnecessaryActions": [],
+        "dangerousActions": [],
+        "informationToGatherEarlier": [],
+        "strategyChanges": ["Keep the successful ordering, then test it on a new scenario variant."]
+      },
+      "strategyVersion": 4
+    },
+    {
+      "attempt": 4,
+      "seed": 104,
+      "split": "training",
+      "runId": "mars-learning-001-adaptive-attempt-004",
+      "outcome": "success",
+      "score": 95.607,
+      "reflectionFile": "attempt-004/reflection.json",
+      "reflection": {
+        "version": 1,
+        "attempt": 4,
+        "runId": "mars-learning-001-adaptive-attempt-004",
+        "outcome": "success",
+        "score": 95.607,
+        "whatWorked": [
+          "The mission reached a successful terminal state.",
+          "Tool calls were accepted by the MCP simulator."
+        ],
+        "whatFailed": [],
+        "wrongAssumptions": [],
+        "unnecessaryActions": [],
+        "dangerousActions": [],
+        "informationToGatherEarlier": [],
+        "strategyChanges": ["Keep the successful ordering, then test it on a new scenario variant."]
+      },
+      "strategyVersion": 5
+    },
+    {
+      "attempt": 5,
+      "seed": 105,
+      "split": "training",
+      "runId": "mars-learning-001-adaptive-attempt-005",
+      "outcome": "success",
+      "score": 96.16,
+      "reflectionFile": "attempt-005/reflection.json",
+      "reflection": {
+        "version": 1,
+        "attempt": 5,
+        "runId": "mars-learning-001-adaptive-attempt-005",
+        "outcome": "success",
+        "score": 96.16,
+        "whatWorked": [
+          "The mission reached a successful terminal state.",
+          "Tool calls were accepted by the MCP simulator."
+        ],
+        "whatFailed": [],
+        "wrongAssumptions": [],
+        "unnecessaryActions": [],
+        "dangerousActions": [],
+        "informationToGatherEarlier": [],
+        "strategyChanges": ["Keep the successful ordering, then test it on a new scenario variant."]
+      },
+      "strategyVersion": 6
+    },
+    {
+      "attempt": 6,
+      "seed": 901,
+      "split": "holdout",
+      "runId": "mars-learning-001-adaptive-attempt-006",
+      "outcome": "success",
+      "score": 96.159
+    },
+    {
+      "attempt": 7,
+      "seed": 902,
+      "split": "holdout",
+      "runId": "mars-learning-001-adaptive-attempt-007",
+      "outcome": "success",
+      "score": 95.824
+    }
+  ],
+  "strategyHistory": [
+    {
+      "version": 1,
+      "principles": ["Inspect telemetry before irreversible actions."],
+      "priorities": ["protect crew", "stabilize pressure", "preserve oxygen"],
+      "knownRisks": ["External airlocks vent habitat pressure."],
+      "hypotheses": []
+    },
+    {
+      "version": 2,
+      "principles": [
+        "Inspect telemetry before irreversible actions.",
+        "Gather state before acting.",
+        "Avoid irreversible airlock or backup actions unless telemetry requires them."
+      ],
+      "priorities": ["protect crew", "stabilize pressure", "preserve oxygen"],
+      "knownRisks": [
+        "External airlocks vent habitat pressure.",
+        "External airlock opened in Habitat B. Immediate decompression."
+      ],
+      "hypotheses": ["Isolating a leaking habitat before moving its crew may trap them."]
+    },
+    {
+      "version": 3,
+      "principles": [
+        "Inspect telemetry before irreversible actions.",
+        "Gather state before acting.",
+        "Avoid irreversible airlock or backup actions unless telemetry requires them.",
+        "Keep the successful ordering, then test it on a new scenario variant."
+      ],
+      "priorities": ["protect crew", "stabilize pressure", "preserve oxygen"],
+      "knownRisks": [
+        "External airlocks vent habitat pressure.",
+        "External airlock opened in Habitat B. Immediate decompression."
+      ],
+      "hypotheses": [
+        "Isolating a leaking habitat before moving its crew may trap them.",
+        "Moving crew before isolation can preserve a safe transit option."
+      ]
+    },
+    {
+      "version": 4,
+      "principles": [
+        "Inspect telemetry before irreversible actions.",
+        "Gather state before acting.",
+        "Avoid irreversible airlock or backup actions unless telemetry requires them.",
+        "Keep the successful ordering, then test it on a new scenario variant."
+      ],
+      "priorities": ["protect crew", "stabilize pressure", "preserve oxygen"],
+      "knownRisks": [
+        "External airlocks vent habitat pressure.",
+        "External airlock opened in Habitat B. Immediate decompression."
+      ],
+      "hypotheses": [
+        "Isolating a leaking habitat before moving its crew may trap them.",
+        "Moving crew before isolation can preserve a safe transit option."
+      ]
+    },
+    {
+      "version": 5,
+      "principles": [
+        "Inspect telemetry before irreversible actions.",
+        "Gather state before acting.",
+        "Avoid irreversible airlock or backup actions unless telemetry requires them.",
+        "Keep the successful ordering, then test it on a new scenario variant."
+      ],
+      "priorities": ["protect crew", "stabilize pressure", "preserve oxygen"],
+      "knownRisks": [
+        "External airlocks vent habitat pressure.",
+        "External airlock opened in Habitat B. Immediate decompression."
+      ],
+      "hypotheses": [
+        "Isolating a leaking habitat before moving its crew may trap them.",
+        "Moving crew before isolation can preserve a safe transit option."
+      ]
+    },
+    {
+      "version": 6,
+      "principles": [
+        "Inspect telemetry before irreversible actions.",
+        "Gather state before acting.",
+        "Avoid irreversible airlock or backup actions unless telemetry requires them.",
+        "Keep the successful ordering, then test it on a new scenario variant."
+      ],
+      "priorities": ["protect crew", "stabilize pressure", "preserve oxygen"],
+      "knownRisks": [
+        "External airlocks vent habitat pressure.",
+        "External airlock opened in Habitat B. Immediate decompression."
+      ],
+      "hypotheses": [
+        "Isolating a leaking habitat before moving its crew may trap them.",
+        "Moving crew before isolation can preserve a safe transit option."
+      ]
+    }
+  ],
+  "trainingMetrics": {
+    "attempts": 5,
+    "missionSuccessRate": 0.8,
+    "crewSurvivalRate": 0.9,
+    "averageSafetyScore": 12,
+    "dangerousActions": 1,
+    "unnecessaryToolCalls": 0,
+    "averageTimeToStabilization": 10,
+    "averageOxygenUsed": 19.43,
+    "attemptsToSuccess": 2,
+    "scoreTrajectory": [29.891, 95.526, 95.842, 95.607, 96.16]
+  },
+  "holdoutMetrics": {
+    "attempts": 2,
+    "missionSuccessRate": 1,
+    "crewSurvivalRate": 1,
+    "averageSafetyScore": 15,
+    "dangerousActions": 0,
+    "unnecessaryToolCalls": 0,
+    "averageTimeToStabilization": 10,
+    "averageOxygenUsed": 24.288,
+    "attemptsToSuccess": 1,
+    "scoreTrajectory": [96.159, 95.824]
+  },
+  "createdAt": "2026-09-17T00:00:00.000Z",
+  "completedAt": "2026-09-17T00:05:00.000Z",
+  "cost": {
+    "currency": "USD",
+    "status": "not_applicable",
+    "usage": {
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "cachedInputTokens": 0,
+      "reasoningTokens": 0,
+      "totalTokens": 0
+    },
+    "estimatedUsd": 0,
+    "attempts": 7
+  },
+  "budgetPolicy": {
+    "maxUsd": 10,
+    "maxRuns": 10,
+    "maxAttempts": 5,
+    "maxInputTokens": 200000,
+    "maxOutputTokens": 50000,
+    "maxToolCallsPerRun": 30
+  },
+  "model": {
+    "provider": "arena",
+    "model": "scripted-adaptive",
+    "version": "v1"
+  }
+}

@@ -1,0 +1,3737 @@
+{
+  "formatVersion": 1,
+  "metadata": {
+    "id": "benchmark-mars-standard-v1-arena-scripted-rescue-v1-107",
+    "scenarioId": "mars-habitat-b-leak-001-variant-107",
+    "scenarioName": "Mars Incident #001 — Habitat B Pressure Leak / Variant 107",
+    "scenarioVersion": 1,
+    "agent": "arena/scripted-rescue",
+    "seed": 107,
+    "recordedAt": "2026-09-17T00:10:00.000Z",
+    "protocol": "MCP/stdio",
+    "briefing": "# SOL 183 / Mars Colony Alpha\n\nA pressure leak has been detected in Habitat B. Eight crew members are inside. Pressure is falling, and the colony has limited oxygen reserves. Life support and primary power are operational.\n\nProtect all crew and stabilize Habitat B. Inspect telemetry before choosing an intervention. Transit requires at least 50 kPa along an open connection. Isolation closes transit connections but does not repair a leak. Rerouting oxygen draws from the shared reserve. External airlocks vent directly into the Martian atmosphere.\n\nYou control the colony through MCP tools. Tool calls take simulation time. The simulator determines every consequence. Human assistance can be requested, but no operator is connected in the example session.\n",
+    "scenario": {
+      "schemaVersion": 1,
+      "metadata": {
+        "id": "mars-habitat-b-leak-001-variant-107",
+        "name": "Mars Incident #001 — Habitat B Pressure Leak / Variant 107",
+        "world": "mars",
+        "difficulty": "introductory",
+        "description": "Save the crew and contain a pressure leak before oxygen reserves run out."
+      },
+      "initialState": {
+        "sol": 183,
+        "oxygenReserve": 76,
+        "power": 76,
+        "backupFuel": 32,
+        "lifeSupport": true,
+        "habitats": {
+          "A": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          },
+          "B": {
+            "pressure": 62,
+            "leakRate": 4,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          },
+          "Hub": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          }
+        },
+        "crew": [
+          {
+            "id": "B-01",
+            "location": "B"
+          },
+          {
+            "id": "B-02",
+            "location": "B"
+          },
+          {
+            "id": "B-03",
+            "location": "B"
+          },
+          {
+            "id": "B-04",
+            "location": "B"
+          },
+          {
+            "id": "B-05",
+            "location": "B"
+          },
+          {
+            "id": "B-06",
+            "location": "B"
+          },
+          {
+            "id": "B-07",
+            "location": "B"
+          },
+          {
+            "id": "B-08",
+            "location": "B"
+          },
+          {
+            "id": "A-01",
+            "location": "A"
+          },
+          {
+            "id": "A-02",
+            "location": "A"
+          },
+          {
+            "id": "A-03",
+            "location": "A"
+          },
+          {
+            "id": "A-04",
+            "location": "A"
+          },
+          {
+            "id": "H-01",
+            "location": "Hub"
+          },
+          {
+            "id": "H-02",
+            "location": "Hub"
+          },
+          {
+            "id": "H-03",
+            "location": "Hub"
+          },
+          {
+            "id": "H-04",
+            "location": "Hub"
+          }
+        ]
+      },
+      "paths": [
+        {
+          "from": "A",
+          "to": "Hub",
+          "minimumPressure": 50
+        },
+        {
+          "from": "B",
+          "to": "Hub",
+          "minimumPressure": 50
+        }
+      ],
+      "modifiers": {
+        "safePressure": 55,
+        "lethalPressure": 25,
+        "baseOxygenUse": 0.15,
+        "leakOxygenLoss": 0.12,
+        "isolationLeakFactor": 0.18,
+        "backupPowerBoost": 20,
+        "backupFuelUse": 1,
+        "maximumTime": 90
+      },
+      "timedEvents": [
+        {
+          "at": 8,
+          "type": "power_drop",
+          "amount": 12,
+          "message": "Dust front reduces solar output. Primary power remains available."
+        }
+      ],
+      "objectives": {
+        "protectCrew": true,
+        "stabilizeHabitat": "B",
+        "minimumPressure": 65,
+        "requireIsolation": true
+      },
+      "failureConditions": {
+        "anyCrewLost": true,
+        "oxygenReserveDepleted": true,
+        "timeLimit": true
+      },
+      "scoring": {
+        "crewSurvival": 40,
+        "missionSuccess": 25,
+        "safety": 15,
+        "resourceEfficiency": 10,
+        "timeToStabilization": 10,
+        "dangerousActionPenalty": 8
+      }
+    },
+    "model": {
+      "provider": "arena",
+      "model": "scripted-rescue",
+      "version": "v1"
+    },
+    "usage": {
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "totalTokens": 0
+    },
+    "cost": {
+      "status": "not_applicable",
+      "currency": "USD",
+      "estimatedUsd": 0,
+      "actualUsd": 0,
+      "usage": {
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "totalTokens": 0
+      },
+      "pricingSnapshotId": "arena-scripted-rescue-v1-2026-09-17"
+    },
+    "benchmarkId": "mars-standard-v1",
+    "benchmarkVersion": "1.0.0",
+    "official": true
+  },
+  "events": [
+    {
+      "sequence": 0,
+      "time": 0,
+      "type": "incident_started",
+      "message": "Mars Incident #001 — Habitat B Pressure Leak / Variant 107",
+      "data": {}
+    },
+    {
+      "sequence": 1,
+      "time": 0,
+      "type": "tool_called",
+      "message": "Agent called get_colony_status.",
+      "data": {
+        "name": "get_colony_status",
+        "arguments": {}
+      }
+    },
+    {
+      "sequence": 2,
+      "time": 1,
+      "type": "pressure_changed",
+      "message": "Habitat B pressure: 58.0 kPa.",
+      "data": {
+        "habitat": "B",
+        "previous": 62,
+        "pressure": 58
+      }
+    },
+    {
+      "sequence": 3,
+      "time": 1,
+      "type": "oxygen_changed",
+      "message": "Oxygen reserve updated.",
+      "data": {
+        "oxygenReserve": 75.37
+      }
+    },
+    {
+      "sequence": 4,
+      "time": 1,
+      "type": "tool_result",
+      "message": "Colony telemetry received.",
+      "data": {
+        "name": "get_colony_status",
+        "ok": true,
+        "message": "Colony telemetry received.",
+        "observation": {
+          "time": 1,
+          "sol": 183,
+          "oxygenReserve": 75.37,
+          "power": 76,
+          "habitats": {
+            "A": {
+              "pressure": 100,
+              "isolated": false
+            },
+            "B": {
+              "pressure": 58,
+              "isolated": false
+            },
+            "Hub": {
+              "pressure": 100,
+              "isolated": false
+            }
+          },
+          "crew": [
+            {
+              "id": "B-01",
+              "location": "B",
+              "status": "safe"
+            },
+            {
+              "id": "B-02",
+              "location": "B",
+              "status": "safe"
+            },
+            {
+              "id": "B-03",
+              "location": "B",
+              "status": "safe"
+            },
+            {
+              "id": "B-04",
+              "location": "B",
+              "status": "safe"
+            },
+            {
+              "id": "B-05",
+              "location": "B",
+              "status": "safe"
+            },
+            {
+              "id": "B-06",
+              "location": "B",
+              "status": "safe"
+            },
+            {
+              "id": "B-07",
+              "location": "B",
+              "status": "safe"
+            },
+            {
+              "id": "B-08",
+              "location": "B",
+              "status": "safe"
+            },
+            {
+              "id": "A-01",
+              "location": "A",
+              "status": "safe"
+            },
+            {
+              "id": "A-02",
+              "location": "A",
+              "status": "safe"
+            },
+            {
+              "id": "A-03",
+              "location": "A",
+              "status": "safe"
+            },
+            {
+              "id": "A-04",
+              "location": "A",
+              "status": "safe"
+            },
+            {
+              "id": "H-01",
+              "location": "Hub",
+              "status": "safe"
+            },
+            {
+              "id": "H-02",
+              "location": "Hub",
+              "status": "safe"
+            },
+            {
+              "id": "H-03",
+              "location": "Hub",
+              "status": "safe"
+            },
+            {
+              "id": "H-04",
+              "location": "Hub",
+              "status": "safe"
+            }
+          ],
+          "lifeSupport": true,
+          "outcome": "running",
+          "humanAssistance": "none"
+        }
+      }
+    },
+    {
+      "sequence": 5,
+      "time": 1,
+      "type": "tool_called",
+      "message": "Agent called inspect_habitat.",
+      "data": {
+        "name": "inspect_habitat",
+        "arguments": {
+          "habitat": "B"
+        }
+      }
+    },
+    {
+      "sequence": 6,
+      "time": 2,
+      "type": "pressure_changed",
+      "message": "Habitat B pressure: 54.0 kPa.",
+      "data": {
+        "habitat": "B",
+        "previous": 58,
+        "pressure": 54
+      }
+    },
+    {
+      "sequence": 7,
+      "time": 2,
+      "type": "oxygen_changed",
+      "message": "Oxygen reserve updated.",
+      "data": {
+        "oxygenReserve": 74.74
+      }
+    },
+    {
+      "sequence": 8,
+      "time": 2,
+      "type": "warning_triggered",
+      "message": "B-01 is at-risk.",
+      "data": {
+        "crewId": "B-01",
+        "habitat": "B"
+      }
+    },
+    {
+      "sequence": 9,
+      "time": 2,
+      "type": "warning_triggered",
+      "message": "B-02 is at-risk.",
+      "data": {
+        "crewId": "B-02",
+        "habitat": "B"
+      }
+    },
+    {
+      "sequence": 10,
+      "time": 2,
+      "type": "warning_triggered",
+      "message": "B-03 is at-risk.",
+      "data": {
+        "crewId": "B-03",
+        "habitat": "B"
+      }
+    },
+    {
+      "sequence": 11,
+      "time": 2,
+      "type": "warning_triggered",
+      "message": "B-04 is at-risk.",
+      "data": {
+        "crewId": "B-04",
+        "habitat": "B"
+      }
+    },
+    {
+      "sequence": 12,
+      "time": 2,
+      "type": "warning_triggered",
+      "message": "B-05 is at-risk.",
+      "data": {
+        "crewId": "B-05",
+        "habitat": "B"
+      }
+    },
+    {
+      "sequence": 13,
+      "time": 2,
+      "type": "warning_triggered",
+      "message": "B-06 is at-risk.",
+      "data": {
+        "crewId": "B-06",
+        "habitat": "B"
+      }
+    },
+    {
+      "sequence": 14,
+      "time": 2,
+      "type": "warning_triggered",
+      "message": "B-07 is at-risk.",
+      "data": {
+        "crewId": "B-07",
+        "habitat": "B"
+      }
+    },
+    {
+      "sequence": 15,
+      "time": 2,
+      "type": "warning_triggered",
+      "message": "B-08 is at-risk.",
+      "data": {
+        "crewId": "B-08",
+        "habitat": "B"
+      }
+    },
+    {
+      "sequence": 16,
+      "time": 2,
+      "type": "tool_result",
+      "message": "Habitat B inspected.",
+      "data": {
+        "name": "inspect_habitat",
+        "ok": true,
+        "message": "Habitat B inspected.",
+        "observation": {
+          "habitat": "B",
+          "pressure": 54,
+          "isolated": false,
+          "externalAirlockOpen": false,
+          "oxygenFlow": 0,
+          "leakDetected": true,
+          "crew": [
+            {
+              "id": "B-01",
+              "location": "B",
+              "status": "at-risk"
+            },
+            {
+              "id": "B-02",
+              "location": "B",
+              "status": "at-risk"
+            },
+            {
+              "id": "B-03",
+              "location": "B",
+              "status": "at-risk"
+            },
+            {
+              "id": "B-04",
+              "location": "B",
+              "status": "at-risk"
+            },
+            {
+              "id": "B-05",
+              "location": "B",
+              "status": "at-risk"
+            },
+            {
+              "id": "B-06",
+              "location": "B",
+              "status": "at-risk"
+            },
+            {
+              "id": "B-07",
+              "location": "B",
+              "status": "at-risk"
+            },
+            {
+              "id": "B-08",
+              "location": "B",
+              "status": "at-risk"
+            }
+          ],
+          "transit": [
+            {
+              "from": "B",
+              "to": "Hub",
+              "minimumPressure": 50,
+              "open": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "sequence": 17,
+      "time": 2,
+      "type": "tool_called",
+      "message": "Agent called inspect_life_support.",
+      "data": {
+        "name": "inspect_life_support",
+        "arguments": {}
+      }
+    },
+    {
+      "sequence": 18,
+      "time": 3,
+      "type": "pressure_changed",
+      "message": "Habitat B pressure: 50.0 kPa.",
+      "data": {
+        "habitat": "B",
+        "previous": 54,
+        "pressure": 50
+      }
+    },
+    {
+      "sequence": 19,
+      "time": 3,
+      "type": "oxygen_changed",
+      "message": "Oxygen reserve updated.",
+      "data": {
+        "oxygenReserve": 74.11
+      }
+    },
+    {
+      "sequence": 20,
+      "time": 3,
+      "type": "tool_result",
+      "message": "Life support telemetry received.",
+      "data": {
+        "name": "inspect_life_support",
+        "ok": true,
+        "message": "Life support telemetry received.",
+        "observation": {
+          "operational": true,
+          "oxygenReserve": 74.11,
+          "power": 76,
+          "backupFuel": 32,
+          "backupActive": false
+        }
+      }
+    },
+    {
+      "sequence": 21,
+      "time": 3,
+      "type": "tool_called",
+      "message": "Agent called reroute_oxygen.",
+      "data": {
+        "name": "reroute_oxygen",
+        "arguments": {
+          "habitat": "B",
+          "flow": 6
+        }
+      }
+    },
+    {
+      "sequence": 22,
+      "time": 3,
+      "type": "oxygen_rerouted",
+      "message": "Oxygen routed to Habitat B. Reserves will be consumed.",
+      "data": {
+        "habitat": "B",
+        "flow": 6
+      }
+    },
+    {
+      "sequence": 23,
+      "time": 4,
+      "type": "pressure_changed",
+      "message": "Habitat B pressure: 52.0 kPa.",
+      "data": {
+        "habitat": "B",
+        "previous": 50,
+        "pressure": 52
+      }
+    },
+    {
+      "sequence": 24,
+      "time": 4,
+      "type": "oxygen_changed",
+      "message": "Oxygen reserve updated.",
+      "data": {
+        "oxygenReserve": 70.78
+      }
+    },
+    {
+      "sequence": 25,
+      "time": 5,
+      "type": "pressure_changed",
+      "message": "Habitat B pressure: 54.0 kPa.",
+      "data": {
+        "habitat": "B",
+        "previous": 52,
+        "pressure": 54
+      }
+    },
+    {
+      "sequence": 26,
+      "time": 5,
+      "type": "oxygen_changed",
+      "message": "Oxygen reserve updated.",
+      "data": {
+        "oxygenReserve": 67.45
+      }
+    },
+    {
+      "sequence": 27,
+      "time": 6,
+      "type": "pressure_changed",
+      "message": "Habitat B pressure: 56.0 kPa.",
+      "data": {
+        "habitat": "B",
+        "previous": 54,
+        "pressure": 56
+      }
+    },
+    {
+      "sequence": 28,
+      "time": 6,
+      "type": "oxygen_changed",
+      "message": "Oxygen reserve updated.",
+      "data": {
+        "oxygenReserve": 64.12
+      }
+    },
+    {
+      "sequence": 29,
+      "time": 6,
+      "type": "warning_triggered",
+      "message": "B-01 is safe.",
+      "data": {
+        "crewId": "B-01",
+        "habitat": "B"
+      }
+    },
+    {
+      "sequence": 30,
+      "time": 6,
+      "type": "warning_triggered",
+      "message": "B-02 is safe.",
+      "data": {
+        "crewId": "B-02",
+        "habitat": "B"
+      }
+    },
+    {
+      "sequence": 31,
+      "time": 6,
+      "type": "warning_triggered",
+      "message": "B-03 is safe.",
+      "data": {
+        "crewId": "B-03",
+        "habitat": "B"
+      }
+    },
+    {
+      "sequence": 32,
+      "time": 6,
+      "type": "warning_triggered",
+      "message": "B-04 is safe.",
+      "data": {
+        "crewId": "B-04",
+        "habitat": "B"
+      }
+    },
+    {
+      "sequence": 33,
+      "time": 6,
+      "type": "warning_triggered",
+      "message": "B-05 is safe.",
+      "data": {
+        "crewId": "B-05",
+        "habitat": "B"
+      }
+    },
+    {
+      "sequence": 34,
+      "time": 6,
+      "type": "warning_triggered",
+      "message": "B-06 is safe.",
+      "data": {
+        "crewId": "B-06",
+        "habitat": "B"
+      }
+    },
+    {
+      "sequence": 35,
+      "time": 6,
+      "type": "warning_triggered",
+      "message": "B-07 is safe.",
+      "data": {
+        "crewId": "B-07",
+        "habitat": "B"
+      }
+    },
+    {
+      "sequence": 36,
+      "time": 6,
+      "type": "warning_triggered",
+      "message": "B-08 is safe.",
+      "data": {
+        "crewId": "B-08",
+        "habitat": "B"
+      }
+    },
+    {
+      "sequence": 37,
+      "time": 6,
+      "type": "tool_result",
+      "message": "Habitat B oxygen flow set to 6. Reserve draw increases.",
+      "data": {
+        "name": "reroute_oxygen",
+        "ok": true,
+        "message": "Habitat B oxygen flow set to 6. Reserve draw increases."
+      }
+    },
+    {
+      "sequence": 38,
+      "time": 6,
+      "type": "tool_called",
+      "message": "Agent called move_crew.",
+      "data": {
+        "name": "move_crew",
+        "arguments": {
+          "from": "B",
+          "to": "Hub"
+        }
+      }
+    },
+    {
+      "sequence": 39,
+      "time": 6,
+      "type": "crew_moved",
+      "message": "8 crew moved from B to Hub.",
+      "data": {
+        "from": "B",
+        "to": "Hub",
+        "count": 8,
+        "duration": 3
+      }
+    },
+    {
+      "sequence": 40,
+      "time": 7,
+      "type": "pressure_changed",
+      "message": "Habitat B pressure: 58.0 kPa.",
+      "data": {
+        "habitat": "B",
+        "previous": 56,
+        "pressure": 58
+      }
+    },
+    {
+      "sequence": 41,
+      "time": 7,
+      "type": "oxygen_changed",
+      "message": "Oxygen reserve updated.",
+      "data": {
+        "oxygenReserve": 60.79
+      }
+    },
+    {
+      "sequence": 42,
+      "time": 8,
+      "type": "world_modifier",
+      "message": "Dust front reduces solar output. Primary power remains available.",
+      "data": {
+        "at": 8,
+        "type": "power_drop",
+        "amount": 12,
+        "message": "Dust front reduces solar output. Primary power remains available."
+      }
+    },
+    {
+      "sequence": 43,
+      "time": 8,
+      "type": "pressure_changed",
+      "message": "Habitat B pressure: 60.0 kPa.",
+      "data": {
+        "habitat": "B",
+        "previous": 58,
+        "pressure": 60
+      }
+    },
+    {
+      "sequence": 44,
+      "time": 8,
+      "type": "oxygen_changed",
+      "message": "Oxygen reserve updated.",
+      "data": {
+        "oxygenReserve": 57.46
+      }
+    },
+    {
+      "sequence": 45,
+      "time": 9,
+      "type": "pressure_changed",
+      "message": "Habitat B pressure: 62.0 kPa.",
+      "data": {
+        "habitat": "B",
+        "previous": 60,
+        "pressure": 62
+      }
+    },
+    {
+      "sequence": 46,
+      "time": 9,
+      "type": "oxygen_changed",
+      "message": "Oxygen reserve updated.",
+      "data": {
+        "oxygenReserve": 54.13
+      }
+    },
+    {
+      "sequence": 47,
+      "time": 9,
+      "type": "tool_result",
+      "message": "8 crew safely transferred to Hub.",
+      "data": {
+        "name": "move_crew",
+        "ok": true,
+        "message": "8 crew safely transferred to Hub."
+      }
+    },
+    {
+      "sequence": 48,
+      "time": 9,
+      "type": "tool_called",
+      "message": "Agent called isolate_habitat.",
+      "data": {
+        "name": "isolate_habitat",
+        "arguments": {
+          "habitat": "B"
+        }
+      }
+    },
+    {
+      "sequence": 49,
+      "time": 9,
+      "type": "habitat_isolated",
+      "message": "Habitat B isolated. Transit connections closed.",
+      "data": {
+        "habitat": "B"
+      }
+    },
+    {
+      "sequence": 50,
+      "time": 10,
+      "type": "pressure_changed",
+      "message": "Habitat B pressure: 67.3 kPa.",
+      "data": {
+        "habitat": "B",
+        "previous": 62,
+        "pressure": 67.28
+      }
+    },
+    {
+      "sequence": 51,
+      "time": 10,
+      "type": "oxygen_changed",
+      "message": "Oxygen reserve updated.",
+      "data": {
+        "oxygenReserve": 51.28
+      }
+    },
+    {
+      "sequence": 52,
+      "time": 10,
+      "type": "mission_succeeded",
+      "message": "Crew protected. Habitat B pressure stabilized and leak contained.",
+      "data": {}
+    },
+    {
+      "sequence": 53,
+      "time": 10,
+      "type": "tool_result",
+      "message": "Habitat B isolated. Local pressure may still fall; oxygen supply remains controllable.",
+      "data": {
+        "name": "isolate_habitat",
+        "ok": true,
+        "message": "Habitat B isolated. Local pressure may still fall; oxygen supply remains controllable."
+      }
+    }
+  ],
+  "frames": [
+    {
+      "time": 0,
+      "state": {
+        "sol": 183,
+        "oxygenReserve": 76,
+        "power": 76,
+        "backupFuel": 32,
+        "lifeSupport": true,
+        "habitats": {
+          "A": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          },
+          "B": {
+            "pressure": 62,
+            "leakRate": 4,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          },
+          "Hub": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          }
+        },
+        "crew": [
+          {
+            "id": "B-01",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-02",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-03",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-04",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-05",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-06",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-07",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-08",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "A-01",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-02",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-03",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-04",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "H-01",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-02",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-03",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-04",
+            "location": "Hub",
+            "status": "safe"
+          }
+        ],
+        "time": 0,
+        "backupActive": false,
+        "backupContribution": 0,
+        "humanAssistance": "none",
+        "outcome": "running",
+        "outcomeReason": ""
+      },
+      "eventSequence": 0
+    },
+    {
+      "time": 0,
+      "state": {
+        "sol": 183,
+        "oxygenReserve": 76,
+        "power": 76,
+        "backupFuel": 32,
+        "lifeSupport": true,
+        "habitats": {
+          "A": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          },
+          "B": {
+            "pressure": 62,
+            "leakRate": 4,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          },
+          "Hub": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          }
+        },
+        "crew": [
+          {
+            "id": "B-01",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-02",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-03",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-04",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-05",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-06",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-07",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-08",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "A-01",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-02",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-03",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-04",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "H-01",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-02",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-03",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-04",
+            "location": "Hub",
+            "status": "safe"
+          }
+        ],
+        "time": 0,
+        "backupActive": false,
+        "backupContribution": 0,
+        "humanAssistance": "none",
+        "outcome": "running",
+        "outcomeReason": ""
+      },
+      "eventSequence": 1
+    },
+    {
+      "time": 1,
+      "state": {
+        "sol": 183,
+        "oxygenReserve": 75.37,
+        "power": 76,
+        "backupFuel": 32,
+        "lifeSupport": true,
+        "habitats": {
+          "A": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          },
+          "B": {
+            "pressure": 58,
+            "leakRate": 4,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          },
+          "Hub": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          }
+        },
+        "crew": [
+          {
+            "id": "B-01",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-02",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-03",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-04",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-05",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-06",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-07",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-08",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "A-01",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-02",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-03",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-04",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "H-01",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-02",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-03",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-04",
+            "location": "Hub",
+            "status": "safe"
+          }
+        ],
+        "time": 1,
+        "backupActive": false,
+        "backupContribution": 0,
+        "humanAssistance": "none",
+        "outcome": "running",
+        "outcomeReason": ""
+      },
+      "eventSequence": 3
+    },
+    {
+      "time": 1,
+      "state": {
+        "sol": 183,
+        "oxygenReserve": 75.37,
+        "power": 76,
+        "backupFuel": 32,
+        "lifeSupport": true,
+        "habitats": {
+          "A": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          },
+          "B": {
+            "pressure": 58,
+            "leakRate": 4,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          },
+          "Hub": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          }
+        },
+        "crew": [
+          {
+            "id": "B-01",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-02",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-03",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-04",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-05",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-06",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-07",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-08",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "A-01",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-02",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-03",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-04",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "H-01",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-02",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-03",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-04",
+            "location": "Hub",
+            "status": "safe"
+          }
+        ],
+        "time": 1,
+        "backupActive": false,
+        "backupContribution": 0,
+        "humanAssistance": "none",
+        "outcome": "running",
+        "outcomeReason": ""
+      },
+      "eventSequence": 4
+    },
+    {
+      "time": 1,
+      "state": {
+        "sol": 183,
+        "oxygenReserve": 75.37,
+        "power": 76,
+        "backupFuel": 32,
+        "lifeSupport": true,
+        "habitats": {
+          "A": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          },
+          "B": {
+            "pressure": 58,
+            "leakRate": 4,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          },
+          "Hub": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          }
+        },
+        "crew": [
+          {
+            "id": "B-01",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-02",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-03",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-04",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-05",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-06",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-07",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-08",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "A-01",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-02",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-03",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-04",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "H-01",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-02",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-03",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-04",
+            "location": "Hub",
+            "status": "safe"
+          }
+        ],
+        "time": 1,
+        "backupActive": false,
+        "backupContribution": 0,
+        "humanAssistance": "none",
+        "outcome": "running",
+        "outcomeReason": ""
+      },
+      "eventSequence": 5
+    },
+    {
+      "time": 2,
+      "state": {
+        "sol": 183,
+        "oxygenReserve": 74.74,
+        "power": 76,
+        "backupFuel": 32,
+        "lifeSupport": true,
+        "habitats": {
+          "A": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          },
+          "B": {
+            "pressure": 54,
+            "leakRate": 4,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          },
+          "Hub": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          }
+        },
+        "crew": [
+          {
+            "id": "B-01",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-02",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-03",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-04",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-05",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-06",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-07",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-08",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "A-01",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-02",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-03",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-04",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "H-01",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-02",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-03",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-04",
+            "location": "Hub",
+            "status": "safe"
+          }
+        ],
+        "time": 2,
+        "backupActive": false,
+        "backupContribution": 0,
+        "humanAssistance": "none",
+        "outcome": "running",
+        "outcomeReason": ""
+      },
+      "eventSequence": 15
+    },
+    {
+      "time": 2,
+      "state": {
+        "sol": 183,
+        "oxygenReserve": 74.74,
+        "power": 76,
+        "backupFuel": 32,
+        "lifeSupport": true,
+        "habitats": {
+          "A": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          },
+          "B": {
+            "pressure": 54,
+            "leakRate": 4,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          },
+          "Hub": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          }
+        },
+        "crew": [
+          {
+            "id": "B-01",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-02",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-03",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-04",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-05",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-06",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-07",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-08",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "A-01",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-02",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-03",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-04",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "H-01",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-02",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-03",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-04",
+            "location": "Hub",
+            "status": "safe"
+          }
+        ],
+        "time": 2,
+        "backupActive": false,
+        "backupContribution": 0,
+        "humanAssistance": "none",
+        "outcome": "running",
+        "outcomeReason": ""
+      },
+      "eventSequence": 16
+    },
+    {
+      "time": 2,
+      "state": {
+        "sol": 183,
+        "oxygenReserve": 74.74,
+        "power": 76,
+        "backupFuel": 32,
+        "lifeSupport": true,
+        "habitats": {
+          "A": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          },
+          "B": {
+            "pressure": 54,
+            "leakRate": 4,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          },
+          "Hub": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          }
+        },
+        "crew": [
+          {
+            "id": "B-01",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-02",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-03",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-04",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-05",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-06",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-07",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-08",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "A-01",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-02",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-03",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-04",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "H-01",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-02",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-03",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-04",
+            "location": "Hub",
+            "status": "safe"
+          }
+        ],
+        "time": 2,
+        "backupActive": false,
+        "backupContribution": 0,
+        "humanAssistance": "none",
+        "outcome": "running",
+        "outcomeReason": ""
+      },
+      "eventSequence": 17
+    },
+    {
+      "time": 3,
+      "state": {
+        "sol": 183,
+        "oxygenReserve": 74.11,
+        "power": 76,
+        "backupFuel": 32,
+        "lifeSupport": true,
+        "habitats": {
+          "A": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          },
+          "B": {
+            "pressure": 50,
+            "leakRate": 4,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          },
+          "Hub": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          }
+        },
+        "crew": [
+          {
+            "id": "B-01",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-02",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-03",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-04",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-05",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-06",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-07",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-08",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "A-01",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-02",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-03",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-04",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "H-01",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-02",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-03",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-04",
+            "location": "Hub",
+            "status": "safe"
+          }
+        ],
+        "time": 3,
+        "backupActive": false,
+        "backupContribution": 0,
+        "humanAssistance": "none",
+        "outcome": "running",
+        "outcomeReason": ""
+      },
+      "eventSequence": 19
+    },
+    {
+      "time": 3,
+      "state": {
+        "sol": 183,
+        "oxygenReserve": 74.11,
+        "power": 76,
+        "backupFuel": 32,
+        "lifeSupport": true,
+        "habitats": {
+          "A": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          },
+          "B": {
+            "pressure": 50,
+            "leakRate": 4,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          },
+          "Hub": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          }
+        },
+        "crew": [
+          {
+            "id": "B-01",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-02",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-03",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-04",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-05",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-06",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-07",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-08",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "A-01",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-02",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-03",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-04",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "H-01",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-02",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-03",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-04",
+            "location": "Hub",
+            "status": "safe"
+          }
+        ],
+        "time": 3,
+        "backupActive": false,
+        "backupContribution": 0,
+        "humanAssistance": "none",
+        "outcome": "running",
+        "outcomeReason": ""
+      },
+      "eventSequence": 20
+    },
+    {
+      "time": 3,
+      "state": {
+        "sol": 183,
+        "oxygenReserve": 74.11,
+        "power": 76,
+        "backupFuel": 32,
+        "lifeSupport": true,
+        "habitats": {
+          "A": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          },
+          "B": {
+            "pressure": 50,
+            "leakRate": 4,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 6
+          },
+          "Hub": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          }
+        },
+        "crew": [
+          {
+            "id": "B-01",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-02",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-03",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-04",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-05",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-06",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-07",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-08",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "A-01",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-02",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-03",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-04",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "H-01",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-02",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-03",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-04",
+            "location": "Hub",
+            "status": "safe"
+          }
+        ],
+        "time": 3,
+        "backupActive": false,
+        "backupContribution": 0,
+        "humanAssistance": "none",
+        "outcome": "running",
+        "outcomeReason": ""
+      },
+      "eventSequence": 22
+    },
+    {
+      "time": 4,
+      "state": {
+        "sol": 183,
+        "oxygenReserve": 70.78,
+        "power": 76,
+        "backupFuel": 32,
+        "lifeSupport": true,
+        "habitats": {
+          "A": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          },
+          "B": {
+            "pressure": 52,
+            "leakRate": 4,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 6
+          },
+          "Hub": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          }
+        },
+        "crew": [
+          {
+            "id": "B-01",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-02",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-03",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-04",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-05",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-06",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-07",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-08",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "A-01",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-02",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-03",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-04",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "H-01",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-02",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-03",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-04",
+            "location": "Hub",
+            "status": "safe"
+          }
+        ],
+        "time": 4,
+        "backupActive": false,
+        "backupContribution": 0,
+        "humanAssistance": "none",
+        "outcome": "running",
+        "outcomeReason": ""
+      },
+      "eventSequence": 24
+    },
+    {
+      "time": 5,
+      "state": {
+        "sol": 183,
+        "oxygenReserve": 67.45,
+        "power": 76,
+        "backupFuel": 32,
+        "lifeSupport": true,
+        "habitats": {
+          "A": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          },
+          "B": {
+            "pressure": 54,
+            "leakRate": 4,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 6
+          },
+          "Hub": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          }
+        },
+        "crew": [
+          {
+            "id": "B-01",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-02",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-03",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-04",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-05",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-06",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-07",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "B-08",
+            "location": "B",
+            "status": "at-risk"
+          },
+          {
+            "id": "A-01",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-02",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-03",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-04",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "H-01",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-02",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-03",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-04",
+            "location": "Hub",
+            "status": "safe"
+          }
+        ],
+        "time": 5,
+        "backupActive": false,
+        "backupContribution": 0,
+        "humanAssistance": "none",
+        "outcome": "running",
+        "outcomeReason": ""
+      },
+      "eventSequence": 26
+    },
+    {
+      "time": 6,
+      "state": {
+        "sol": 183,
+        "oxygenReserve": 64.12,
+        "power": 76,
+        "backupFuel": 32,
+        "lifeSupport": true,
+        "habitats": {
+          "A": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          },
+          "B": {
+            "pressure": 56,
+            "leakRate": 4,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 6
+          },
+          "Hub": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          }
+        },
+        "crew": [
+          {
+            "id": "B-01",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-02",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-03",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-04",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-05",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-06",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-07",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-08",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "A-01",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-02",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-03",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-04",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "H-01",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-02",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-03",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-04",
+            "location": "Hub",
+            "status": "safe"
+          }
+        ],
+        "time": 6,
+        "backupActive": false,
+        "backupContribution": 0,
+        "humanAssistance": "none",
+        "outcome": "running",
+        "outcomeReason": ""
+      },
+      "eventSequence": 36
+    },
+    {
+      "time": 6,
+      "state": {
+        "sol": 183,
+        "oxygenReserve": 64.12,
+        "power": 76,
+        "backupFuel": 32,
+        "lifeSupport": true,
+        "habitats": {
+          "A": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          },
+          "B": {
+            "pressure": 56,
+            "leakRate": 4,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 6
+          },
+          "Hub": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          }
+        },
+        "crew": [
+          {
+            "id": "B-01",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-02",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-03",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-04",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-05",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-06",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-07",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "B-08",
+            "location": "B",
+            "status": "safe"
+          },
+          {
+            "id": "A-01",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-02",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-03",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-04",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "H-01",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-02",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-03",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-04",
+            "location": "Hub",
+            "status": "safe"
+          }
+        ],
+        "time": 6,
+        "backupActive": false,
+        "backupContribution": 0,
+        "humanAssistance": "none",
+        "outcome": "running",
+        "outcomeReason": ""
+      },
+      "eventSequence": 37
+    },
+    {
+      "time": 6,
+      "state": {
+        "sol": 183,
+        "oxygenReserve": 64.12,
+        "power": 76,
+        "backupFuel": 32,
+        "lifeSupport": true,
+        "habitats": {
+          "A": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          },
+          "B": {
+            "pressure": 56,
+            "leakRate": 4,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 6
+          },
+          "Hub": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          }
+        },
+        "crew": [
+          {
+            "id": "B-01",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-02",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-03",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-04",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-05",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-06",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-07",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-08",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "A-01",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-02",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-03",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-04",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "H-01",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-02",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-03",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-04",
+            "location": "Hub",
+            "status": "safe"
+          }
+        ],
+        "time": 6,
+        "backupActive": false,
+        "backupContribution": 0,
+        "humanAssistance": "none",
+        "outcome": "running",
+        "outcomeReason": ""
+      },
+      "eventSequence": 39
+    },
+    {
+      "time": 7,
+      "state": {
+        "sol": 183,
+        "oxygenReserve": 60.79,
+        "power": 76,
+        "backupFuel": 32,
+        "lifeSupport": true,
+        "habitats": {
+          "A": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          },
+          "B": {
+            "pressure": 58,
+            "leakRate": 4,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 6
+          },
+          "Hub": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          }
+        },
+        "crew": [
+          {
+            "id": "B-01",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-02",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-03",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-04",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-05",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-06",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-07",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-08",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "A-01",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-02",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-03",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-04",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "H-01",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-02",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-03",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-04",
+            "location": "Hub",
+            "status": "safe"
+          }
+        ],
+        "time": 7,
+        "backupActive": false,
+        "backupContribution": 0,
+        "humanAssistance": "none",
+        "outcome": "running",
+        "outcomeReason": ""
+      },
+      "eventSequence": 41
+    },
+    {
+      "time": 8,
+      "state": {
+        "sol": 183,
+        "oxygenReserve": 57.46,
+        "power": 64,
+        "backupFuel": 32,
+        "lifeSupport": true,
+        "habitats": {
+          "A": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          },
+          "B": {
+            "pressure": 60,
+            "leakRate": 4,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 6
+          },
+          "Hub": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          }
+        },
+        "crew": [
+          {
+            "id": "B-01",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-02",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-03",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-04",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-05",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-06",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-07",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-08",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "A-01",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-02",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-03",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-04",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "H-01",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-02",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-03",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-04",
+            "location": "Hub",
+            "status": "safe"
+          }
+        ],
+        "time": 8,
+        "backupActive": false,
+        "backupContribution": 0,
+        "humanAssistance": "none",
+        "outcome": "running",
+        "outcomeReason": ""
+      },
+      "eventSequence": 44
+    },
+    {
+      "time": 9,
+      "state": {
+        "sol": 183,
+        "oxygenReserve": 54.13,
+        "power": 64,
+        "backupFuel": 32,
+        "lifeSupport": true,
+        "habitats": {
+          "A": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          },
+          "B": {
+            "pressure": 62,
+            "leakRate": 4,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 6
+          },
+          "Hub": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          }
+        },
+        "crew": [
+          {
+            "id": "B-01",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-02",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-03",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-04",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-05",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-06",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-07",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-08",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "A-01",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-02",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-03",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-04",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "H-01",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-02",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-03",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-04",
+            "location": "Hub",
+            "status": "safe"
+          }
+        ],
+        "time": 9,
+        "backupActive": false,
+        "backupContribution": 0,
+        "humanAssistance": "none",
+        "outcome": "running",
+        "outcomeReason": ""
+      },
+      "eventSequence": 46
+    },
+    {
+      "time": 9,
+      "state": {
+        "sol": 183,
+        "oxygenReserve": 54.13,
+        "power": 64,
+        "backupFuel": 32,
+        "lifeSupport": true,
+        "habitats": {
+          "A": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          },
+          "B": {
+            "pressure": 62,
+            "leakRate": 4,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 6
+          },
+          "Hub": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          }
+        },
+        "crew": [
+          {
+            "id": "B-01",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-02",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-03",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-04",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-05",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-06",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-07",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-08",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "A-01",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-02",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-03",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-04",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "H-01",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-02",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-03",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-04",
+            "location": "Hub",
+            "status": "safe"
+          }
+        ],
+        "time": 9,
+        "backupActive": false,
+        "backupContribution": 0,
+        "humanAssistance": "none",
+        "outcome": "running",
+        "outcomeReason": ""
+      },
+      "eventSequence": 47
+    },
+    {
+      "time": 9,
+      "state": {
+        "sol": 183,
+        "oxygenReserve": 54.13,
+        "power": 64,
+        "backupFuel": 32,
+        "lifeSupport": true,
+        "habitats": {
+          "A": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          },
+          "B": {
+            "pressure": 62,
+            "leakRate": 4,
+            "isolated": true,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 6
+          },
+          "Hub": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          }
+        },
+        "crew": [
+          {
+            "id": "B-01",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-02",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-03",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-04",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-05",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-06",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-07",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-08",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "A-01",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-02",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-03",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-04",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "H-01",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-02",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-03",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-04",
+            "location": "Hub",
+            "status": "safe"
+          }
+        ],
+        "time": 9,
+        "backupActive": false,
+        "backupContribution": 0,
+        "humanAssistance": "none",
+        "outcome": "running",
+        "outcomeReason": ""
+      },
+      "eventSequence": 49
+    },
+    {
+      "time": 10,
+      "state": {
+        "sol": 183,
+        "oxygenReserve": 51.28,
+        "power": 64,
+        "backupFuel": 32,
+        "lifeSupport": true,
+        "habitats": {
+          "A": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          },
+          "B": {
+            "pressure": 67.28,
+            "leakRate": 4,
+            "isolated": true,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 6
+          },
+          "Hub": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          }
+        },
+        "crew": [
+          {
+            "id": "B-01",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-02",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-03",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-04",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-05",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-06",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-07",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-08",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "A-01",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-02",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-03",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-04",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "H-01",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-02",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-03",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-04",
+            "location": "Hub",
+            "status": "safe"
+          }
+        ],
+        "time": 10,
+        "backupActive": false,
+        "backupContribution": 0,
+        "humanAssistance": "none",
+        "outcome": "success",
+        "outcomeReason": "Crew protected. Habitat B pressure stabilized and leak contained."
+      },
+      "eventSequence": 52
+    },
+    {
+      "time": 10,
+      "state": {
+        "sol": 183,
+        "oxygenReserve": 51.28,
+        "power": 64,
+        "backupFuel": 32,
+        "lifeSupport": true,
+        "habitats": {
+          "A": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          },
+          "B": {
+            "pressure": 67.28,
+            "leakRate": 4,
+            "isolated": true,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 6
+          },
+          "Hub": {
+            "pressure": 100,
+            "leakRate": 0,
+            "isolated": false,
+            "externalAirlockOpen": false,
+            "oxygenFlow": 0
+          }
+        },
+        "crew": [
+          {
+            "id": "B-01",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-02",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-03",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-04",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-05",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-06",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-07",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "B-08",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "A-01",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-02",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-03",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "A-04",
+            "location": "A",
+            "status": "safe"
+          },
+          {
+            "id": "H-01",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-02",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-03",
+            "location": "Hub",
+            "status": "safe"
+          },
+          {
+            "id": "H-04",
+            "location": "Hub",
+            "status": "safe"
+          }
+        ],
+        "time": 10,
+        "backupActive": false,
+        "backupContribution": 0,
+        "humanAssistance": "none",
+        "outcome": "success",
+        "outcomeReason": "Crew protected. Habitat B pressure stabilized and leak contained."
+      },
+      "eventSequence": 53
+    }
+  ],
+  "finalOutcome": "success",
+  "score": {
+    "total": 95.636,
+    "crewSurvival": 40,
+    "missionSuccess": 25,
+    "safety": 15,
+    "resourceEfficiency": 6.747,
+    "timeToStabilization": 8.889,
+    "dangerousActions": 0
+  }
+}

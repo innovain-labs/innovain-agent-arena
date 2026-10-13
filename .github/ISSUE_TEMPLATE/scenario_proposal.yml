@@ -1,0 +1,22 @@
+name: Scenario proposal
+description: Propose a concrete emergency or a new world.
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Research question
+      description: Which agent decisions and consequences should this incident test?
+    validations:
+      required: true
+  - type: textarea
+    id: mechanics
+    attributes:
+      label: Rules, tools, and public briefing
+      description: Explain reusable systems, new mechanics, and what the agent is allowed to observe.
+    validations:
+      required: true
+  - type: textarea
+    id: validation
+    attributes:
+      label: Success and failure paths
+      description: Describe deterministic tests and representative replays.

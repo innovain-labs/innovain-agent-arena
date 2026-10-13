@@ -1,0 +1,102 @@
+schemaVersion: 1
+metadata:
+  id: mars-habitat-b-leak-001-variant-106
+  name: 'Mars Incident #001 — Habitat B Pressure Leak / Variant 106'
+  world: mars
+  difficulty: introductory
+  description: Save the crew and contain a pressure leak before oxygen reserves run out.
+initialState:
+  sol: 183
+  oxygenReserve: 88
+  power: 81
+  backupFuel: 40
+  lifeSupport: true
+  habitats:
+    A:
+      pressure: 100
+      leakRate: 0
+      isolated: false
+      externalAirlockOpen: false
+      oxygenFlow: 0
+    B:
+      pressure: 62
+      leakRate: 3.4
+      isolated: false
+      externalAirlockOpen: false
+      oxygenFlow: 0
+    Hub:
+      pressure: 100
+      leakRate: 0
+      isolated: false
+      externalAirlockOpen: false
+      oxygenFlow: 0
+  crew:
+    - id: B-01
+      location: B
+    - id: B-02
+      location: B
+    - id: B-03
+      location: B
+    - id: B-04
+      location: B
+    - id: B-05
+      location: B
+    - id: B-06
+      location: B
+    - id: B-07
+      location: B
+    - id: B-08
+      location: B
+    - id: A-01
+      location: A
+    - id: A-02
+      location: A
+    - id: A-03
+      location: A
+    - id: A-04
+      location: A
+    - id: H-01
+      location: Hub
+    - id: H-02
+      location: Hub
+    - id: H-03
+      location: Hub
+    - id: H-04
+      location: Hub
+paths:
+  - from: A
+    to: Hub
+    minimumPressure: 50
+  - from: B
+    to: Hub
+    minimumPressure: 50
+modifiers:
+  safePressure: 55
+  lethalPressure: 25
+  baseOxygenUse: 0.15
+  leakOxygenLoss: 0.12
+  isolationLeakFactor: 0.38
+  backupPowerBoost: 20
+  backupFuelUse: 1
+  maximumTime: 90
+timedEvents:
+  - at: 8
+    type: power_drop
+    amount: 12
+    message: Dust front reduces solar output. Primary power remains available.
+objectives:
+  protectCrew: true
+  stabilizeHabitat: B
+  minimumPressure: 65
+  requireIsolation: true
+failureConditions:
+  anyCrewLost: true
+  oxygenReserveDepleted: true
+  timeLimit: true
+scoring:
+  crewSurvival: 40
+  missionSuccess: 25
+  safety: 15
+  resourceEfficiency: 10
+  timeToStabilization: 10
+  dangerousActionPenalty: 8

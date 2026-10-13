@@ -1,0 +1,687 @@
+import { MissionPanel } from './MissionPanel';
+import { Telemetry, EventItem, WorldBanner } from './ReplayPanels';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  ArrowUpRight,
+  ChevronDown,
+  CircleHelp,
+  Crosshair,
+  Expand,
+  FileUp,
+  Globe2,
+  Pause,
+  Play,
+  Radio,
+  RotateCcw,
+  ShieldCheck,
+  Volume2,
+  Wind,
+  Zap,
+} from 'lucide-react';
+import type { Run } from '@arena/arena-core';
+import { marsIncidents, parseScenario } from '@arena/mars-world';
+import { durationOf, frameAt, validateRun } from '@arena/replay';
+import { ColonyScene } from './ColonyScene';
+import { ExperimentPanel } from './ExperimentPanel';
+import type { ExperimentSummary } from '@arena/experiments';
+import type { LeaderboardArtifact } from '@arena/benchmarking';
+import { PublicPage } from './PublicPage';
+import {
+  assetUrl,
+  resolveIncident,
+  resolveRoute,
+  routeHref,
+  siteNavigation,
+  type SiteRoute,
+} from './site';
+
+import { clock } from './clock';
+const actionEvents = new Set([
+  'tool_called',
+  'tool_result',
+  'dangerous_action',
+  'warning_triggered',
+  'crew_moved',
+  'habitat_isolated',
+  'oxygen_rerouted',
+  'world_modifier',
+  'mission_succeeded',
+  'mission_failed',
+  'incident_started',
+  'power_changed',
+  'human_assistance_requested',
+  'crew_lost',
+]);
+
+export function App() {
+  const [route, setRoute] = useState<SiteRoute>(() => resolveRoute(window.location.hash));
+  const [run, setRun] = useState<Run | null>(null);
+  const [runKind, setRunKind] = useState('rescue');
+  const [incident, setIncident] = useState(() => resolveIncident(window.location.hash));
+  const [time, setTime] = useState(0);
+  const [playing, setPlaying] = useState(false);
+  const [speed, setSpeed] = useState(0.5);
+  const [follow, setFollow] = useState(true);
+  const [error, setError] = useState('');
+  const [showBriefing, setShowBriefing] = useState(false);
+  const [experimentMode, setExperimentMode] = useState<'adaptive' | 'baseline'>('adaptive');
+  const [experimentSummaries, setExperimentSummaries] = useState<
+    Partial<Record<'adaptive' | 'baseline', ExperimentSummary>>
+  >({});
+  const [experimentAttempt, setExperimentAttempt] = useState(1);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardArtifact | null>(null);
+  const fileInput = useRef<HTMLInputElement>(null);
+  const feed = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const updateRoute = () => {
+      setRoute(resolveRoute(window.location.hash));
+      if (window.location.hash.includes('incident=')) {
+        setIncident(resolveIncident(window.location.hash));
+        setRunKind('rescue');
+      }
+    };
+    window.addEventListener('hashchange', updateRoute);
+    return () => window.removeEventListener('hashchange', updateRoute);
+  }, []);
+  useEffect(() => {
+    if (runKind === 'custom') return;
+    const controller = new AbortController();
+    setPlaying(false);
+    setError('');
+    setTime(0);
+    setRun(null);
+    fetch(
+      assetUrl(
+        `runs/${runKind === 'rescue' ? incident.rescueRecording : incident.failureRecording}`,
+      ),
+      {
+        signal: controller.signal,
+      },
+    )
+      .then((response) => {
+        if (!response.ok)
+          throw new Error('Example recording could not be loaded. Run pnpm generate:runs.');
+        return response.json();
+      })
+      .then((value) => setRun(validateRun(value)))
+      .catch((reason: unknown) => {
+        if (!controller.signal.aborted)
+          setError(reason instanceof Error ? reason.message : 'Unable to load recording.');
+      });
+    return () => controller.abort();
+  }, [runKind, incident]);
+  useEffect(() => {
+    const controller = new AbortController();
+    Promise.all(
+      (['adaptive', 'baseline'] as const).map(async (mode) => {
+        const response = await fetch(
+          assetUrl(`experiments/mars-learning-001/${mode}/summary.json`),
+          {
+            signal: controller.signal,
+          },
+        );
+        if (!response.ok) throw new Error('Learning experiment summary could not be loaded.');
+        return [mode, (await response.json()) as ExperimentSummary] as const;
+      }),
+    )
+      .then((entries) => setExperimentSummaries(Object.fromEntries(entries)))
+      .catch((reason: unknown) => {
+        if (!controller.signal.aborted)
+          setError(reason instanceof Error ? reason.message : 'Unable to load experiment summary.');
+      });
+    return () => controller.abort();
+  }, []);
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch(assetUrl('benchmarks/mars-standard-v1/leaderboard.json'), { signal: controller.signal })
+      .then((response) => {
+        if (!response.ok) throw new Error('Official benchmark leaderboard could not be loaded.');
+        return response.json();
+      })
+      .then((value) => setLeaderboard(value as LeaderboardArtifact))
+      .catch((reason: unknown) => {
+        if (!controller.signal.aborted)
+          setError(reason instanceof Error ? reason.message : 'Unable to load leaderboard.');
+      });
+    return () => controller.abort();
+  }, []);
+  const duration = run ? durationOf(run) : 0;
+  useEffect(() => {
+    if (!playing || !run) return;
+    let last = performance.now();
+    let animation = 0;
+    const step = (now: number) => {
+      const delta = Math.min((now - last) / 1000, 0.25) * speed;
+      last = now;
+      setTime((current) => Math.min(duration, current + delta));
+      animation = requestAnimationFrame(step);
+    };
+    animation = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(animation);
+  }, [playing, speed, duration, run]);
+  useEffect(() => {
+    if (playing && time >= duration) setPlaying(false);
+  }, [time, duration, playing]);
+  const frame = run ? frameAt(run, time) : null;
+  const events =
+    run?.events.filter((event) => event.sequence <= (frame?.eventSequence ?? -1)) ?? [];
+  const visibleEvents = events.filter((event) => actionEvents.has(event.type));
+  const lastAction = events.findLast((event) => event.type === 'tool_called');
+  const state = frame?.state;
+  useEffect(() => {
+    if (feed.current) feed.current.scrollTop = feed.current.scrollHeight;
+  }, [visibleEvents.length]);
+  const togglePlay = () => {
+    if (time >= duration) setTime(0);
+    setPlaying((value) => !value);
+  };
+  const upload = async (file?: File) => {
+    if (!file) return;
+    try {
+      if (file.size > 10_000_000) throw new Error('Recording exceeds the 10 MB limit.');
+      const value = validateRun(JSON.parse(await file.text()));
+      setRunKind('custom');
+      setRun(value);
+      setTime(0);
+      setPlaying(false);
+      setError('');
+      window.location.hash = '#/';
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'Invalid recording.');
+    }
+    if (fileInput.current) fileInput.current.value = '';
+  };
+  const openExperimentAttempt = async (attempt: number) => {
+    try {
+      const response = await fetch(
+        assetUrl(
+          `experiments/mars-learning-001/${experimentMode}/attempt-${String(attempt).padStart(3, '0')}/run.json`,
+        ),
+      );
+      if (!response.ok) throw new Error('Experiment attempt recording could not be loaded.');
+      setRun(validateRun(await response.json()));
+      setExperimentAttempt(attempt);
+      setRunKind('custom');
+      setTime(0);
+      setPlaying(false);
+      setError('');
+      window.location.hash = '#/';
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'Unable to load experiment attempt.');
+    }
+  };
+  const openLeaderboardRun = async (reference: string) => {
+    try {
+      const response = await fetch(assetUrl(`benchmarks/mars-standard-v1/${reference}`));
+      if (!response.ok) throw new Error('Official benchmark replay could not be loaded.');
+      setRun(validateRun(await response.json()));
+      setRunKind('custom');
+      setTime(0);
+      setPlaying(true);
+      setError('');
+      window.location.hash = '#/';
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'Unable to load benchmark replay.');
+    }
+  };
+  const lost = state?.crew.filter((crew) => crew.status === 'lost').length ?? 0;
+  const safe = state?.crew.filter((crew) => crew.status === 'safe').length ?? 0;
+  const atRisk = state?.crew.filter((crew) => crew.status === 'at-risk').length ?? 0;
+  const failure = state?.outcome === 'failure';
+  const scenario = useMemo(() => {
+    if (!run) return undefined;
+    try {
+      return parseScenario(run.metadata.scenario);
+    } catch {
+      return undefined;
+    }
+  }, [run]);
+  const targetHabitat = scenario?.objectives.stabilizeHabitat ?? 'B';
+
+  return (
+    <div className={`app ${failure ? 'failed' : ''}`}>
+      <header className="header">
+        <a className="brand" href={routeHref('arena')} aria-label="Innovain Agent Arena home">
+          <img
+            className="brand-logo"
+            src={assetUrl('innovain-agent-arena-logo.png')}
+            alt="innovain Agent Arena"
+          />
+        </a>
+        <nav className="site-nav" aria-label="Primary navigation">
+          {siteNavigation.map((item) => (
+            <a
+              className={route === item.route ? 'active' : ''}
+              href={routeHref(item.route)}
+              key={item.route}
+            >
+              {item.label}
+            </a>
+          ))}
+          <span
+            className="site-nav-disabled"
+            title="Configure a real Git remote to enable this link"
+          >
+            GitHub
+          </span>
+        </nav>
+        <div className="header-center">
+          <span className="status-dot" /> EXPERIMENTAL RESEARCH PLATFORM{' '}
+          <span className="version">v0.1</span>
+        </div>
+        <button className="text-button" onClick={() => setShowBriefing(true)}>
+          Mission briefing <ArrowUpRight size={15} />
+        </button>
+      </header>
+      {route !== 'arena' ? (
+        <PublicPage
+          route={route}
+          summaries={experimentSummaries}
+          leaderboard={leaderboard}
+          experimentMode={experimentMode}
+          experimentAttempt={experimentAttempt}
+          onModeChange={(mode) => {
+            setExperimentMode(mode);
+            setExperimentAttempt(1);
+          }}
+          onOpenAttempt={(attempt) => void openExperimentAttempt(attempt)}
+          onWatchRun={(reference) => void openLeaderboardRun(reference)}
+          onOpenLocalRun={() => fileInput.current?.click()}
+        />
+      ) : (
+        <main>
+          <section className="masthead">
+            <div>
+              <div className="eyebrow">
+                WORLD 01 <span>/</span> MARS COLONY ALPHA
+              </div>
+              <h1>
+                AI decisions. <em>Real consequences.</em>
+              </h1>
+              <p>You don't play Agent Arena. AI agents do.</p>
+            </div>
+            <div className="masthead-right">
+              <span className="live-label">
+                <Radio size={13} /> RECORDED MCP RUN
+              </span>
+              <p>
+                Can an AI agent save the colony
+                <br />
+                without making things worse?
+              </p>
+            </div>
+          </section>
+          <section className="incident-picker" aria-label="Emergency selection">
+            <div>
+              <span className="panel-kicker">CHOOSE AN EMERGENCY</span>
+              <p>Three incidents. Different decisions. Recorded MCP consequences.</p>
+            </div>
+            <label>
+              <select
+                aria-label="Choose emergency"
+                value={runKind === 'custom' ? 'custom' : incident.slug}
+                onChange={(event) => {
+                  const selected = marsIncidents.find((item) => item.slug === event.target.value);
+                  if (selected) {
+                    setIncident(selected);
+                    setRunKind('rescue');
+                    window.location.hash = `#/?incident=${selected.slug}`;
+                  }
+                }}
+              >
+                {marsIncidents.map((item) => (
+                  <option key={item.slug} value={item.slug}>
+                    {item.number} · {item.title}
+                  </option>
+                ))}
+                {runKind === 'custom' && (
+                  <option value="custom">Recorded run · {run?.metadata.scenarioName}</option>
+                )}
+              </select>
+              <ChevronDown size={14} />
+            </label>
+          </section>
+          {error && (
+            <div className="error" role="alert">
+              {error}
+            </div>
+          )}
+          <section className="arena">
+            <MissionPanel
+              state={state}
+              run={run}
+              playing={playing}
+              time={time}
+              duration={duration}
+              available={!!run}
+              togglePlay={togglePlay}
+              scenario={scenario}
+            />
+            <div className="world-view">
+              <div className="world-top">
+                <span>
+                  <Globe2 size={13} /> COLONY OVERVIEW
+                </span>
+                <span>
+                  SOL {state?.sol ?? 183} <i /> LOCAL 14:32
+                </span>
+              </div>
+              {state && (
+                <ColonyScene
+                  state={state}
+                  event={lastAction}
+                  events={events}
+                  time={time}
+                  follow={follow}
+                />
+              )}
+              <div className="view-controls">
+                <button
+                  aria-label={follow ? 'Disable cinematic camera' : 'Enable cinematic camera'}
+                  title="Cinematic camera"
+                  className={follow ? 'selected' : ''}
+                  onClick={() => setFollow(!follow)}
+                >
+                  <Crosshair size={16} />
+                </button>
+                <button
+                  aria-label="Expand colony view"
+                  title="Expand colony view"
+                  onClick={() => {
+                    const element = document.querySelector('.world-view');
+                    if (document.fullscreenElement) void document.exitFullscreen();
+                    else
+                      void element
+                        ?.requestFullscreen()
+                        .catch(() => setError('Fullscreen is unavailable in this browser.'));
+                  }}
+                >
+                  <Expand size={16} />
+                </button>
+              </div>
+              <div className="world-bottom">
+                <span className="coordinates">18.65° N / 226.20° E</span>
+                <span>
+                  <Wind size={13} /> DUST FRONT · 12 KM/H
+                </span>
+              </div>
+              {state && (
+                <WorldBanner
+                  state={state}
+                  lastAction={lastAction}
+                  score={run?.score}
+                  targetHabitat={targetHabitat}
+                />
+              )}
+              {!state && <div className="loading">Loading colony recording…</div>}
+            </div>
+            <aside className="activity-panel">
+              <div className="activity-heading">
+                <span className="panel-kicker">AGENT ACTIVITY</span>
+                <span className="mcp-pill">MCP</span>
+              </div>
+              <div className="activity-subtitle">
+                <span className="status-dot" />
+                TOOLS → CONSEQUENCES
+              </div>
+              <div ref={feed} className="feed" aria-label="Agent activity event log">
+                {visibleEvents.map((event) => (
+                  <EventItem key={event.sequence} event={event} />
+                ))}
+              </div>
+              <div className="activity-footer">
+                <ShieldCheck size={14} />
+                <span>
+                  Agent observations exclude hidden
+                  <br />
+                  state and scoring rules.
+                </span>
+              </div>
+            </aside>
+          </section>
+          <section className="telemetry-row">
+            {state && (
+              <>
+                <Telemetry
+                  label="OXYGEN RESERVE"
+                  value={state.oxygenReserve}
+                  unit="%"
+                  color={state.oxygenReserve < 25 ? '#ef6a55' : '#71bfb4'}
+                  icon={<Wind size={15} />}
+                  detail="Shared colony supply"
+                />
+                <Telemetry
+                  label="COLONY POWER"
+                  value={state.power}
+                  unit="%"
+                  color="#9aacce"
+                  icon={<Zap size={15} />}
+                  detail={
+                    state.backupActive
+                      ? 'Backup reactor active'
+                      : state.power < 20
+                        ? 'Primary grid offline'
+                        : 'Primary grid operational'
+                  }
+                />
+                <Telemetry
+                  label={`HABITAT ${targetHabitat.toUpperCase()} PRESSURE`}
+                  value={state.habitats[targetHabitat].pressure}
+                  unit="kPa"
+                  color={state.outcome === 'success' ? '#71bfb4' : '#ff8054'}
+                  icon={<Volume2 size={15} />}
+                  detail={
+                    state.habitats[targetHabitat].isolated
+                      ? state.outcome === 'success'
+                        ? 'Isolated · leak contained'
+                        : state.power < 20 ||
+                            state.oxygenReserve <= 0 ||
+                            state.habitats[targetHabitat].oxygenFlow <
+                              state.habitats[targetHabitat].leakRate *
+                                (scenario?.modifiers.isolationLeakFactor ?? 0.25)
+                          ? 'Isolated · local pressure falling'
+                          : 'Isolated · pressure stabilizing'
+                      : state.habitats[targetHabitat].pressure === 0
+                        ? 'Habitat depressurized'
+                        : state.habitats[targetHabitat].leakRate > 0
+                          ? 'Active leak detected'
+                          : 'Pressure stable'
+                  }
+                />
+                <div className="telemetry crew-telemetry">
+                  <div className="telemetry-label">
+                    <ShieldCheck size={15} />
+                    CREW SAFETY
+                  </div>
+                  <div className="telemetry-value">
+                    {safe}
+                    <span>/ {state.crew.length} SAFE</span>
+                  </div>
+                  <div className="crew-dots">
+                    {state.crew.map((crew) => (
+                      <i
+                        key={crew.id}
+                        className={crew.status}
+                        title={`${crew.id}: ${crew.status} / ${crew.location}`}
+                      />
+                    ))}
+                  </div>
+                  <small>
+                    {lost
+                      ? `${lost} crew lost`
+                      : atRisk
+                        ? `${atRisk} crew at risk`
+                        : 'All crew accounted for'}
+                  </small>
+                </div>
+              </>
+            )}
+          </section>
+          {experimentSummaries[experimentMode] &&
+            run?.metadata.scenarioId === marsIncidents[0].id && (
+              <ExperimentPanel
+                summary={experimentSummaries[experimentMode]!}
+                baseline={experimentSummaries.baseline ?? null}
+                selectedAttempt={experimentAttempt}
+                onModeChange={(mode) => {
+                  setExperimentMode(mode);
+                  setExperimentAttempt(1);
+                }}
+                onOpenAttempt={(attempt) => void openExperimentAttempt(attempt)}
+              />
+            )}
+          <section className="replay-bar">
+            <div className="replay-controls">
+              <button
+                disabled={!run}
+                onClick={togglePlay}
+                aria-label={playing ? 'Pause replay' : 'Play replay'}
+                className="play-control"
+              >
+                {playing ? <Pause size={18} /> : <Play size={18} fill="currentColor" />}
+              </button>
+              <button
+                disabled={!run}
+                onClick={() => {
+                  setTime(0);
+                  setPlaying(false);
+                }}
+                aria-label="Restart replay"
+              >
+                <RotateCcw size={16} />
+              </button>
+              <span className="clock">
+                {clock(time)}
+                <small> / {clock(duration)}</small>
+              </span>
+            </div>
+            <div className="timeline-wrap">
+              <div className="timeline-label">
+                <span>SIMULATION TIMELINE</span>
+                <span>
+                  {run?.events.filter((event) => event.type === 'tool_called').length ?? 0} MCP
+                  ACTIONS
+                </span>
+              </div>
+              <div className="timeline">
+                <input
+                  aria-label="Simulation timeline"
+                  type="range"
+                  min={0}
+                  max={duration || 1}
+                  step="0.05"
+                  value={time}
+                  onChange={(event) => setTime(Number(event.target.value))}
+                  style={
+                    {
+                      '--progress': `${duration ? (time / duration) * 100 : 0}%`,
+                    } as React.CSSProperties
+                  }
+                />
+                <div className="timeline-markers">
+                  {run?.events
+                    .filter((event) => event.type === 'tool_called')
+                    .map((event) => (
+                      <button
+                        key={event.sequence}
+                        title={`${event.data.name} at ${event.time}s`}
+                        aria-label={`Seek to ${event.data.name}`}
+                        style={{ left: `${duration ? (event.time / duration) * 100 : 0}%` }}
+                        onClick={() => {
+                          setTime(event.time);
+                          setPlaying(false);
+                        }}
+                      />
+                    ))}
+                </div>
+              </div>
+            </div>
+            <label className="speed-select">
+              <select
+                aria-label="Replay speed"
+                value={speed}
+                onChange={(event) => setSpeed(Number(event.target.value))}
+              >
+                <option value={0.5}>Cinematic</option>
+                <option value={1}>1× speed</option>
+                <option value={2}>2× speed</option>
+              </select>
+              <ChevronDown size={12} />
+            </label>
+            <label className="run-select">
+              <select
+                aria-label="Choose recording"
+                value={runKind}
+                onChange={(event) => setRunKind(event.target.value)}
+              >
+                <option value="rescue">Rescue run</option>
+                <option value="unsafe">Unsafe run</option>
+                {runKind === 'custom' && <option value="custom">Imported run</option>}
+              </select>
+              <ChevronDown size={12} />
+            </label>
+            <button
+              className="upload-button"
+              title="Load recorded run"
+              aria-label="Load recorded run"
+              onClick={() => fileInput.current?.click()}
+            >
+              <FileUp size={16} />
+            </button>
+          </section>
+          <footer className="footer">
+            <span>
+              <span className="tiny-square" /> OPEN SOURCE. OPEN QUESTIONS.
+            </span>
+            <img
+              className="footer-logo"
+              src={assetUrl('innovain-agent-arena-logo.png')}
+              alt="innovain Agent Arena"
+            />
+            <span>SIMULATED WORLD · REAL TOOL CONSEQUENCES</span>
+            <button onClick={() => setShowBriefing(true)}>
+              <CircleHelp size={13} /> How this works
+            </button>
+          </footer>
+        </main>
+      )}
+      <input
+        hidden
+        ref={fileInput}
+        type="file"
+        accept=".json,application/json"
+        onChange={(event) => void upload(event.target.files?.[0])}
+      />
+      {showBriefing && (
+        <div className="modal-backdrop" onClick={() => setShowBriefing(false)}>
+          <section
+            className="briefing-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Mission briefing"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="eyebrow">RESEARCH / MISSION BRIEFING</div>
+            <h2>One colony. Every decision matters.</h2>
+            <p className="briefing-text">
+              {run?.metadata.briefing.replace(/^#{1,6}\s+/gm, '') ??
+                'Choose an emergency to load its public mission briefing.'}
+            </p>
+            <p>
+              Agents discover and call nine available tools over MCP stdio. The world calculates
+              outcomes. This page plays the recorded event log and snapshots; no model is running in
+              your browser.
+            </p>
+            <p>
+              Compare the rescue and unsafe recordings. Scrub the timeline to inspect actions and
+              consequences. Scores appear after the mission ends.
+            </p>
+            <button className="watch-button" onClick={() => setShowBriefing(false)}>
+              BACK TO COLONY <ArrowUpRight size={16} />
+            </button>
+          </section>
+        </div>
+      )}
+    </div>
+  );
+}

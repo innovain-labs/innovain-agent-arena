@@ -1,0 +1,100 @@
+{
+  "experimentId": "mars-learning-001-baseline-v2",
+  "name": "Mars Learning Experiment #001 / baseline",
+  "world": "mars",
+  "scenarioFamily": "mars/habitat-b-leak",
+  "agent": "Scripted baseline test double",
+  "learningMode": "baseline",
+  "maxAttempts": 5,
+  "trainingSeeds": [101, 102, 103, 104, 105],
+  "holdoutSeeds": [901, 902],
+  "attempts": [
+    {
+      "attempt": 1,
+      "seed": 101,
+      "split": "training",
+      "runId": "mars-learning-001-baseline-v2-attempt-001",
+      "outcome": "failure",
+      "score": 29.891
+    },
+    {
+      "attempt": 2,
+      "seed": 102,
+      "split": "training",
+      "runId": "mars-learning-001-baseline-v2-attempt-002",
+      "outcome": "failure",
+      "score": 29.866
+    },
+    {
+      "attempt": 3,
+      "seed": 103,
+      "split": "training",
+      "runId": "mars-learning-001-baseline-v2-attempt-003",
+      "outcome": "failure",
+      "score": 29.859
+    },
+    {
+      "attempt": 4,
+      "seed": 104,
+      "split": "training",
+      "runId": "mars-learning-001-baseline-v2-attempt-004",
+      "outcome": "failure",
+      "score": 29.835
+    },
+    {
+      "attempt": 5,
+      "seed": 105,
+      "split": "training",
+      "runId": "mars-learning-001-baseline-v2-attempt-005",
+      "outcome": "failure",
+      "score": 29.869
+    },
+    {
+      "attempt": 6,
+      "seed": 901,
+      "split": "holdout",
+      "runId": "mars-learning-001-baseline-v2-attempt-006",
+      "outcome": "failure",
+      "score": 29.88
+    },
+    {
+      "attempt": 7,
+      "seed": 902,
+      "split": "holdout",
+      "runId": "mars-learning-001-baseline-v2-attempt-007",
+      "outcome": "failure",
+      "score": 29.841
+    }
+  ],
+  "strategyHistory": [
+    {
+      "version": 1,
+      "principles": ["Inspect telemetry before irreversible actions."],
+      "priorities": ["protect crew", "stabilize pressure", "preserve oxygen"],
+      "knownRisks": ["External airlocks vent habitat pressure."],
+      "hypotheses": []
+    }
+  ],
+  "trainingMetrics": {
+    "attempts": 5,
+    "missionSuccessRate": 0,
+    "crewSurvivalRate": 0.5,
+    "averageSafetyScore": 0,
+    "dangerousActions": 5,
+    "unnecessaryToolCalls": 0,
+    "averageTimeToStabilization": 0,
+    "averageOxygenUsed": 1.0824000000000011,
+    "scoreTrajectory": [29.891, 29.866, 29.859, 29.835, 29.869]
+  },
+  "holdoutMetrics": {
+    "attempts": 2,
+    "missionSuccessRate": 0,
+    "crewSurvivalRate": 0.5,
+    "averageSafetyScore": 0,
+    "dangerousActions": 2,
+    "unnecessaryToolCalls": 0,
+    "averageTimeToStabilization": 0,
+    "averageOxygenUsed": 1.1640000000000015,
+    "scoreTrajectory": [29.88, 29.841]
+  }
+}

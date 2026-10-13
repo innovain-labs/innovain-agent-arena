@@ -1,0 +1,7 @@
+pnpm-lock.yaml
+node_modules
+dist
+work
+runs/*.json
+apps/web/public/runs/*.json
+LICENSE

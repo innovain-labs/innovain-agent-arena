@@ -1,0 +1,51 @@
+{
+  "name": "innovain-agent-arena",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.25.0",
+  "engines": {
+    "node": "^22.13.0 || ^24.0.0 || >=26.0.0"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @arena/web dev",
+    "build": "pnpm --filter @arena/web build",
+    "preview": "pnpm --filter @arena/web preview",
+    "generate:runs": "tsx apps/server/src/generate-runs.ts",
+    "experiment:run": "tsx apps/server/src/run-experiment.ts",
+    "experiment:compare": "tsx apps/server/src/compare-experiments.ts",
+    "benchmark:run": "tsx apps/server/src/run-benchmark.ts",
+    "benchmark:estimate": "tsx apps/server/src/estimate-benchmark.ts",
+    "benchmark:leaderboard": "tsx apps/server/src/generate-leaderboard.ts",
+    "arena:run": "tsx apps/server/src/run-local.ts",
+    "runs:verify": "tsx apps/server/src/verify-runs.ts",
+    "mcp": "tsx apps/server/src/mcp.ts",
+    "scenario:validate": "tsx apps/server/src/validate-scenario.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "eslint . --max-warnings 0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build"
+  },
+  "devDependencies": {
+    "@arena/agent-runner": "workspace:*",
+    "@arena/replay": "workspace:*",
+    "@arena/scoring": "workspace:*",
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@types/three": "^0.186.0",
+    "eslint": "^10.12.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^16.0.0",
+    "prettier": "^3.9.10",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.0",
+    "typescript-eslint": "^8.71.2",
+    "vite": "8.3.4",
+    "vitest": "^5.0.4",
+    "yaml": "^2.8.0"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "version": 4,
+  "principles": [
+    "Inspect telemetry before irreversible actions.",
+    "Gather state before acting.",
+    "Avoid irreversible airlock or backup actions unless telemetry requires them.",
+    "Keep the successful ordering, then test it on a new scenario variant."
+  ],
+  "priorities": ["protect crew", "stabilize pressure", "preserve oxygen"],
+  "knownRisks": [
+    "External airlocks vent habitat pressure.",
+    "External airlock opened in Habitat B. Immediate decompression."
+  ],
+  "hypotheses": [
+    "Isolating a leaking habitat before moving its crew may trap them.",
+    "Moving crew before isolation can preserve a safe transit option."
+  ]
+}

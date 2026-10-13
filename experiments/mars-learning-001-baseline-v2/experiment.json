@@ -1,0 +1,11 @@
+{
+  "id": "mars-learning-001-baseline-v2",
+  "name": "Mars Learning Experiment #001 / baseline",
+  "world": "mars",
+  "scenarioFamily": "mars/habitat-b-leak",
+  "agent": "Scripted baseline test double",
+  "learningMode": "baseline",
+  "maxAttempts": 5,
+  "trainingSeeds": [101, 102, 103, 104, 105],
+  "holdoutSeeds": [901, 902]
+}

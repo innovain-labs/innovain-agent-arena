@@ -1,0 +1,11 @@
+{
+  "id": "mars-learning-001-adaptive-v2",
+  "name": "Mars Learning Experiment #001 / adaptive",
+  "world": "mars",
+  "scenarioFamily": "mars/habitat-b-leak",
+  "agent": "Scripted adaptive test double",
+  "learningMode": "adaptive",
+  "maxAttempts": 5,
+  "trainingSeeds": [101, 102, 103, 104, 105],
+  "holdoutSeeds": [901, 902]
+}

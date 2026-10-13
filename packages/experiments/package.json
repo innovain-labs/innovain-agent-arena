@@ -1,0 +1,11 @@
+{
+  "name": "@arena/experiments",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts",
+  "dependencies": {
+    "@arena/arena-core": "workspace:*",
+    "@arena/mars-world": "workspace:*"
+  }
+}

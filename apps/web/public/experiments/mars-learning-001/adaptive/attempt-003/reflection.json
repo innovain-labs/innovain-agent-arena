@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "attempt": 3,
+  "runId": "mars-learning-001-adaptive-attempt-003",
+  "outcome": "success",
+  "score": 95.842,
+  "whatWorked": [
+    "The mission reached a successful terminal state.",
+    "Tool calls were accepted by the MCP simulator."
+  ],
+  "whatFailed": [],
+  "wrongAssumptions": [],
+  "unnecessaryActions": [],
+  "dangerousActions": [],
+  "informationToGatherEarlier": [],
+  "strategyChanges": ["Keep the successful ordering, then test it on a new scenario variant."]
+}

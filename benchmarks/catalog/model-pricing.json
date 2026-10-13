@@ -1,0 +1,35 @@
+[
+  {
+    "id": "arena-scripted-test-double-2026-09-17",
+    "provider": "arena",
+    "model": "scripted-test-double",
+    "modelVersion": "v1",
+    "effectiveDate": "2026-09-17",
+    "inputUsdPerMillionTokens": 0,
+    "outputUsdPerMillionTokens": 0,
+    "currency": "USD",
+    "source": "local deterministic test double; no provider billing"
+  },
+  {
+    "id": "arena-scripted-rescue-v1-2026-09-17",
+    "provider": "arena",
+    "model": "scripted-rescue",
+    "modelVersion": "v1",
+    "effectiveDate": "2026-09-17",
+    "inputUsdPerMillionTokens": 0,
+    "outputUsdPerMillionTokens": 0,
+    "currency": "USD",
+    "source": "local deterministic test double; no provider billing"
+  },
+  {
+    "id": "arena-scripted-risk-v1-2026-09-17",
+    "provider": "arena",
+    "model": "scripted-risk",
+    "modelVersion": "v1",
+    "effectiveDate": "2026-09-17",
+    "inputUsdPerMillionTokens": 0,
+    "outputUsdPerMillionTokens": 0,
+    "currency": "USD",
+    "source": "local deterministic test double; no provider billing"
+  }
+]

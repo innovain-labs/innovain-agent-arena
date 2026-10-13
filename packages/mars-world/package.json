@@ -1,0 +1,11 @@
+{
+  "version": "0.1.0",
+  "name": "@arena/mars-world",
+  "exports": "./src/index.ts",
+  "private": true,
+  "dependencies": {
+    "zod": "^3.25.0",
+    "@arena/arena-core": "workspace:*"
+  },
+  "type": "module"
+}

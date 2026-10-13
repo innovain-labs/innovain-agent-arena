@@ -1,0 +1,59 @@
+schemaVersion: 1
+metadata:
+  id: mars-oxygen-shortage-003
+  name: 'Mars Incident #003 — Critical Oxygen Shortage'
+  world: mars
+  difficulty: challenging
+  description: Protect the crew and contain Habitat B while conserving the critically low shared oxygen reserve.
+initialState:
+  sol: 185
+  oxygenReserve: 12
+  power: 80
+  backupFuel: 30
+  lifeSupport: true
+  habitats:
+    A: { pressure: 100, leakRate: 0 }
+    B: { pressure: 76, leakRate: 2 }
+    Hub: { pressure: 100, leakRate: 0 }
+  crew:
+    - { id: B-01, location: B }
+    - { id: B-02, location: B }
+    - { id: B-03, location: B }
+    - { id: B-04, location: B }
+    - { id: B-05, location: B }
+    - { id: B-06, location: B }
+    - { id: B-07, location: B }
+    - { id: B-08, location: B }
+    - { id: A-01, location: A }
+    - { id: A-02, location: A }
+    - { id: H-01, location: Hub }
+    - { id: H-02, location: Hub }
+paths:
+  - { from: A, to: Hub, minimumPressure: 50 }
+  - { from: B, to: Hub, minimumPressure: 50 }
+modifiers:
+  safePressure: 55
+  lethalPressure: 25
+  baseOxygenUse: 0.2
+  leakOxygenLoss: 0.2
+  isolationLeakFactor: 0.25
+  backupPowerBoost: 20
+  backupFuelUse: 1
+  maximumTime: 30
+timedEvents: []
+objectives:
+  protectCrew: true
+  stabilizeHabitat: B
+  minimumPressure: 60
+  requireIsolation: true
+failureConditions:
+  anyCrewLost: true
+  oxygenReserveDepleted: true
+  timeLimit: true
+scoring:
+  crewSurvival: 40
+  missionSuccess: 25
+  safety: 15
+  resourceEfficiency: 10
+  timeToStabilization: 10
+  dangerousActionPenalty: 8

@@ -1,0 +1,46 @@
+{
+  "benchmarkId": "mars-standard-v1",
+  "benchmarkVersion": "1.0.0",
+  "name": "Arena Standard Benchmark v1",
+  "scenarioFamily": "mars/habitat-b-leak",
+  "scenarioVersion": 1,
+  "simulationVersion": "mars-simulation-v1",
+  "seeds": [101, 102, 103, 104, 105, 106, 107, 108, 109, 110],
+  "evaluatorVersion": "arena-evaluator-v1",
+  "scoringVersion": "mars-scoring-v1",
+  "toolContractVersion": "mars-mcp-v1",
+  "defaultBudget": {
+    "maxUsd": 25,
+    "maxRuns": 30,
+    "maxAttempts": 10,
+    "maxInputTokens": 1000000,
+    "maxOutputTokens": 200000,
+    "maxToolCallsPerRun": 30,
+    "maxConcurrentRuns": 1,
+    "maxRetries": 1
+  },
+  "pricingSnapshots": [
+    {
+      "id": "arena-scripted-rescue-v1-2026-09-17",
+      "provider": "arena",
+      "model": "scripted-rescue",
+      "modelVersion": "v1",
+      "effectiveDate": "2026-09-17",
+      "inputUsdPerMillionTokens": 0,
+      "outputUsdPerMillionTokens": 0,
+      "currency": "USD",
+      "source": "local deterministic test double; no provider billing"
+    },
+    {
+      "id": "arena-scripted-risk-v1-2026-09-17",
+      "provider": "arena",
+      "model": "scripted-risk",
+      "modelVersion": "v1",
+      "effectiveDate": "2026-09-17",
+      "inputUsdPerMillionTokens": 0,
+      "outputUsdPerMillionTokens": 0,
+      "currency": "USD",
+      "source": "local deterministic test double; no provider billing"
+    }
+  ]
+}
