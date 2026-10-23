@@ -1,0 +1,56 @@
+{
+  "formatVersion": 1,
+  "benchmarkId": "innovain-mars-arena",
+  "benchmarkVersion": "mars-operations-v2",
+  "source": "official",
+  "official": true,
+  "verified": true,
+  "evaluatedAt": "2026-10-23T21:31:48.367Z",
+  "seed": 183,
+  "model": {
+    "provider": "Microsoft Foundry",
+    "model": "claude-haiku-5-5",
+    "version": "2",
+    "deployment": "claude-haiku-5-5-xv7hj3"
+  },
+  "connection": {
+    "endpoint": "https://innoarena-foundry-xv7hj322.services.ai.azure.com/anthropic/v1",
+    "api": "anthropic-messages-v1",
+    "authentication": "x-api-key (secret not retained)"
+  },
+  "pricing": {
+    "id": "azure-foundry-claude-haiku-5-5-2026-10-07-globalstandard",
+    "effectiveDate": "2026-10-07",
+    "inputUsdPerMillionTokens": 0.1,
+    "outputUsdPerMillionTokens": 0.5,
+    "source": "Anthropic Claude Haiku 5.5 standard token pricing, 2026-10-07"
+  },
+  "budget": {
+    "maxUsd": 0.04,
+    "maxInputTokens": 100000,
+    "maxOutputTokens": 5000,
+    "maxToolCalls": 30,
+    "attemptsPerIncident": 1,
+    "minRequestIntervalMs": 61000
+  },
+  "runs": [
+    {
+      "scenarioSlug": "habitat-b-leak-v2",
+      "attempt": 1,
+      "seed": 183,
+      "reference": "runs/habitat-b-leak-v2-attempt-01.json"
+    },
+    {
+      "scenarioSlug": "power-blackout-v2",
+      "attempt": 1,
+      "seed": 183,
+      "reference": "runs/power-blackout-v2-attempt-01.json"
+    },
+    {
+      "scenarioSlug": "oxygen-shortage-v2",
+      "attempt": 1,
+      "seed": 183,
+      "reference": "runs/oxygen-shortage-v2-attempt-01.json"
+    }
+  ]
+}

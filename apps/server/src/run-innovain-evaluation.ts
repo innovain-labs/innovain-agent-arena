@@ -4,6 +4,7 @@ import type { Run } from '@arena/arena-core';
 import { currentMarsIncidents } from '@arena/mars-world';
 import { validateRun } from '@arena/replay';
 import { executeLocalRun, parseLocalRunArgs, pricingFor } from './run-local';
+import type { LocalRunOptions } from './run-local';
 import { verifyCommunityRun } from './community';
 import {
   buildInnovainLeaderboard,
@@ -35,6 +36,7 @@ async function readResumableRun(
   deployment: string,
   modelVersion: string,
   pricingId: string,
+  provider: LocalRunOptions['provider'],
   canonical: Awaited<ReturnType<typeof loadScenario>>,
 ): Promise<Run | undefined> {
   try {
@@ -49,8 +51,11 @@ async function readResumableRun(
       run.metadata.scenarioId !== scenarioId ||
       run.metadata.seed !== seed ||
       (run.metadata.official !== false && !alreadyPromoted) ||
-      !['foundry', 'Microsoft Foundry'].includes(model?.provider ?? '') ||
-      model?.model !== deployment ||
+      !(
+        model?.provider === provider ||
+        (['foundry', 'anthropic'].includes(provider) && model?.provider === 'Microsoft Foundry')
+      ) ||
+      (model?.deployment ?? model?.model) !== deployment ||
       (alreadyPromoted && model.version !== modelVersion) ||
       (model.configuration?.stopReason &&
         model.configuration.stopReason !== 'MODEL_STOPPED_BEFORE_TERMINAL_OUTCOME') ||
@@ -68,6 +73,29 @@ async function readResumableRun(
   } catch {
     return undefined;
   }
+}
+
+export function foundryConnectionFor(options: LocalRunOptions) {
+  if (options.provider === 'foundry')
+    return {
+      api: 'azure-openai-v1' as const,
+      authentication: 'api-key (secret not retained)' as const,
+    };
+  if (options.provider !== 'anthropic' || !options.baseUrl)
+    throw new Error('Innovain official evaluation requires a supported Microsoft Foundry API.');
+  const endpoint = new URL(options.baseUrl);
+  if (
+    !endpoint.hostname.endsWith('.services.ai.azure.com') ||
+    endpoint.pathname.replace(/\/+$/, '') !== '/anthropic/v1' ||
+    !/^claude-/i.test(options.model)
+  )
+    throw new Error(
+      'Foundry Claude requires a deployment name beginning with claude- and a Foundry /anthropic/v1 endpoint.',
+    );
+  return {
+    api: 'anthropic-messages-v1' as const,
+    authentication: 'x-api-key (secret not retained)' as const,
+  };
 }
 
 export async function runInnovainEvaluation(argv: string[]): Promise<void> {
@@ -91,8 +119,8 @@ export async function runInnovainEvaluation(argv: string[]): Promise<void> {
   if (args.includes('--scenario') || args.includes('--output'))
     throw new Error('Innovain evaluation fixes the complete suite and its output paths.');
   const options = parseLocalRunArgs(args);
-  if (options.provider !== 'foundry')
-    throw new Error('Innovain official evaluation currently requires Azure Foundry.');
+  if (options.provider !== 'foundry' && options.provider !== 'anthropic')
+    throw new Error('Innovain official evaluation requires Azure Foundry.');
   if (!options.baseUrl || !options.apiKeyEnv)
     throw new Error('Azure Foundry endpoint and local API-key environment variable are required.');
   if (
@@ -102,6 +130,9 @@ export async function runInnovainEvaluation(argv: string[]): Promise<void> {
     throw new Error('Set both explicit pricing flags so the suite can enforce its cost limit.');
   const modelName = catalogModel ?? options.model;
   const modelVersion = catalogVersion ?? 'unversioned';
+  const connection = foundryConnectionFor(options);
+  if (options.provider === 'anthropic' && !/^claude-/i.test(modelName))
+    throw new Error('The Foundry Anthropic Messages API can only be recorded for Claude models.');
   if (!/^[a-zA-Z0-9 ._/@:+-]{1,160}$/.test(modelName) || !modelVersion)
     throw new Error('Catalog model identity is invalid.');
 
@@ -179,6 +210,7 @@ export async function runInnovainEvaluation(argv: string[]): Promise<void> {
             options.model,
             modelVersion,
             pricingId,
+            options.provider,
             canonical,
           )
         : undefined;
@@ -251,8 +283,7 @@ export async function runInnovainEvaluation(argv: string[]): Promise<void> {
     },
     connection: {
       endpoint: options.baseUrl,
-      api: 'azure-openai-v1' as const,
-      authentication: 'api-key (secret not retained)' as const,
+      ...connection,
     },
     pricing: {
       id: pricingId,
@@ -267,6 +298,7 @@ export async function runInnovainEvaluation(argv: string[]): Promise<void> {
       maxOutputTokens: options.maxOutputTokens,
       maxToolCalls: options.maxToolCalls,
       attemptsPerIncident,
+      minRequestIntervalMs: options.minRequestIntervalMs,
     },
     runs: officialRuns,
   };

@@ -4,7 +4,7 @@
   "exports": "./src/index.ts",
   "private": true,
   "dependencies": {
-    "zod": "^3.25.0",
+    "zod": "^4.6.7",
     "@arena/arena-core": "workspace:*"
   },
   "type": "module"

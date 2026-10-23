@@ -21,7 +21,6 @@ pnpm innovain:evaluate -- `
   --max-output-tokens 2000 `
   --max-tool-calls 30 `
   --request-timeout-ms 60000 `
-  --request-timeout-ms 60000 `
   --input-price-usd-per-million 0.20 `
   --output-price-usd-per-million 1.20 `
   --price-effective-date 2026-07-30 `
@@ -34,6 +33,47 @@ This example makes six runs (two per emergency) and caps the suite at about **$0
 If a suite stops partway through, repeat it with `--resume --evaluation-id <same-id>`. The runner reuses completed, replay-verified attempts that match the scenario, seed and deployment, then retries missing or incomplete attempts. It refuses to overwrite a suite that already has its final manifest.
 
 The v2 incident worlds are deterministic and do not vary with the seed. Repeated attempts therefore measure variation in model decisions from the same initial incident state; they are not independent world variants. Each completed result stores the actual decisions and replay so the score can be reproduced without calling Azure again.
+
+## Claude Haiku 5.5 in Foundry
+
+Claude models use Foundry's Anthropic Messages API (`/anthropic/v1/messages`), so the official evaluator records the API contract separately from Azure OpenAI. This command runs one attempt for each of the three emergencies against the Azure-hosted Claude Haiku 5.5 deployment, caps the suite at **$0.04 estimated token cost**, and retains no key in the evaluation files. Foundry lists Hosted on Azure as model version `2`; confirm the model card and pricing before a future rerun. Foundry requires accepting the Anthropic Marketplace offer and providing accurate organization details during deployment.
+
+```powershell
+$env:CLAUDE_FOUNDRY_API_KEY = (az cognitiveservices account keys list `
+  --resource-group RESOURCE_GROUP `
+  --name FOUNDRY_ACCOUNT `
+  --query key1 -o tsv)
+pnpm innovain:evaluate -- `
+  --provider anthropic `
+  --base-url https://FOUNDRY_ACCOUNT.services.ai.azure.com/anthropic/v1 `
+  --api-key-env CLAUDE_FOUNDRY_API_KEY `
+  --model DEPLOYMENT_NAME `
+  --catalog-model claude-haiku-5-5 `
+  --catalog-version 2 `
+  --region eastus2 `
+  --deployment-type GlobalStandard `
+  --attempts 1 `
+  --seed 183 `
+  --suite-budget-usd 0.04 `
+  --max-input-tokens 100000 `
+  --max-output-tokens 5000 `
+  --max-tool-calls 30 `
+  --request-timeout-ms 60000 `
+  --min-request-interval-ms 61000 `
+  --input-price-usd-per-million 0.10 `
+  --output-price-usd-per-million 0.50 `
+  --price-effective-date 2026-10-07 `
+  --price-source 'Anthropic Claude Haiku 5.5 standard token pricing, 2026-10-07'
+Remove-Item Env:CLAUDE_FOUNDRY_API_KEY
+```
+
+The token ceilings yield a worst-case estimate of **$0.0375** at Anthropic's published rates; the $0.04 suite cap leaves a small margin. The 61-second request interval is recorded in the manifest to stay below this subscription's observed input-token rate limit. Earlier interrupted attempts used about $0.008 in estimated tokens, so the total estimated exposure across this test remains under **$0.05**. Foundry converts usage to Claude Consumption Units, bills those hourly through Azure Marketplace, and may apply private-offer discounts. Check Foundry Monitor and Azure Cost Management for the invoiced amount. Deleting the temporary Foundry account prevents further inference from it, but already-metered usage remains billable.
+
+## DeepSeek V4 Pro in Foundry
+
+The official suite used the Azure OpenAI-compatible endpoint and verified a tool-call round trip before evaluation. DeepSeek returned a function call; the runner passed that request to the real MCP stdio session, executed the tool, and returned its result to the model. The model does not connect to the MCP server itself; the runner bridges Foundry function calling to MCP. This configuration averaged **13 MCP tool calls per run**.
+
+DeepSeek completed the pressure-leak and blackout missions, then stopped before a terminal outcome in the oxygen emergency. The resulting suite score is **86.33/100** from two successful missions out of three, with **US$0.169 estimated** API cost. The oxygen result is a mission failure, not a tool-protocol failure. The temporary Foundry deployment was deleted after evaluation; the [manifest and three recordings](../../benchmarks/innovain-arena/evaluations/deepseek-v4-pro-20261023/evaluation.json) remain available for offline replay and score verification. Re-running the model requires a new Foundry deployment.
 
 `pnpm innovain:leaderboard` replays all saved official records against the canonical v2 scenarios, recalculates scores and costs, and writes both the source artifact and the static site copy. CI performs this rebuild and checks that the generated files are committed. The browser's **Watch Run** plays the saved replay and makes no provider request.
 

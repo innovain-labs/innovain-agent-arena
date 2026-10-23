@@ -103,7 +103,7 @@ export function WorldBanner({
         )}
         <div className="score-line">
           <Flag size={13} />
-          FINAL SCORE <b>{score?.total.toFixed(1)}</b> / 100 · Safety {score?.safety.toFixed(0)}
+          RUN SCORE <b>{score?.total.toFixed(1)}</b> / 100 · Safety {score?.safety.toFixed(0)}
         </div>
       </div>
     );

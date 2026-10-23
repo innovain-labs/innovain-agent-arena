@@ -32,6 +32,11 @@ export function MissionPanel({
   const tokens = run?.metadata.usage?.totalTokens ?? runCost?.usage.totalTokens ?? 0;
   const toolCalls = run?.events.filter((event) => event.type === 'tool_called').length ?? 0;
   const unpriced = !runCost && run?.metadata.usage !== undefined;
+  const provider = run?.metadata.model?.provider.toLowerCase();
+  const isManualPractice = run?.metadata.protocol === 'browser/manual';
+  const isModelRecording = !!run?.metadata.model && provider !== 'arena' && provider !== 'scripted';
+  const isScriptedRecording =
+    !run?.metadata.model && run?.metadata.agent.toLowerCase().startsWith('scripted');
   const costLabel =
     runCost?.status === 'actual'
       ? 'ACTUAL'
@@ -139,13 +144,13 @@ export function MissionPanel({
             : (run?.metadata.agent ?? 'Loading agent')}
         </strong>
         <small>
-          {run?.metadata.protocol === 'browser/manual'
+          {isManualPractice
             ? 'Human practice · browser simulation'
-            : run?.metadata.model &&
-                run.metadata.model.provider !== 'arena' &&
-                run.metadata.model.provider !== 'scripted'
-              ? 'Recorded model run · real MCP / stdio'
-              : 'Scripted baseline · real MCP / stdio'}
+            : isModelRecording
+              ? 'Recorded model run · saved MCP trace'
+              : isScriptedRecording
+                ? 'Scripted demo · pre-recorded MCP trace'
+                : 'Saved recording · model identity unavailable'}
         </small>
       </div>
       <div className="run-cost" aria-label="Run economics">
@@ -178,14 +183,22 @@ export function MissionPanel({
       </div>
       <button className="watch-button" disabled={!available} onClick={togglePlay}>
         {playing ? <Pause size={16} /> : <Play size={16} fill="currentColor" />}
-        {playing ? 'PAUSE RUN' : time > 0 && time < duration ? 'RESUME RUN' : 'WATCH RUN'}
+        {playing
+          ? 'PAUSE RECORDING'
+          : time > 0 && time < duration
+            ? 'RESUME RECORDING'
+            : 'PLAY RECORDING'}
         <ArrowUpRight size={17} />
       </button>
       {typeof stopReason === 'string' && <p className="run-stop">{stopReason}</p>}
-      <small className="no-model">
-        {run?.metadata.protocol === 'browser/manual'
-          ? 'Live browser practice. No AI model or MCP transport.'
-          : 'Replay only. This browser makes no live model calls.'}
+      <small className="replay-note">
+        {isManualPractice
+          ? 'Browser practice only. No AI model or MCP server is called.'
+          : isModelRecording
+            ? 'Saved model trace. Playback does not call the provider again.'
+            : isScriptedRecording
+              ? 'Scripted demo recording. No LLM API call is made during playback.'
+              : 'Saved recording. Playback does not make live provider calls.'}
       </small>
     </aside>
   );

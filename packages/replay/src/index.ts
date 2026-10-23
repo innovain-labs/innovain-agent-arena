@@ -66,7 +66,7 @@ const runSchema = z.object({
         model: z.string().optional(),
         version: z.string().optional(),
         deployment: z.string().optional(),
-        configuration: z.record(z.unknown()).optional(),
+        configuration: z.record(z.string(), z.unknown()).optional(),
       })
       .optional(),
     usage: z
@@ -104,7 +104,7 @@ const runSchema = z.object({
       time: z.number().int().nonnegative(),
       type: z.string(),
       message: z.string(),
-      data: z.record(z.unknown()),
+      data: z.record(z.string(), z.unknown()),
     }),
   ),
   frames: z
@@ -129,7 +129,10 @@ const runSchema = z.object({
 });
 export function validateRun(value: unknown): Run {
   const run = runSchema.parse(value) as Run;
-  const toolData = z.object({ name: z.string().min(1), arguments: z.record(z.unknown()) });
+  const toolData = z.object({
+    name: z.string().min(1),
+    arguments: z.record(z.string(), z.unknown()),
+  });
   for (const event of run.events) if (event.type === 'tool_called') toolData.parse(event.data);
   if (
     run.frames[0]!.time !== 0 ||

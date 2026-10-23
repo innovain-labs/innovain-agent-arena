@@ -23,6 +23,10 @@ Review the existing private repository, confirm its organization remote and bran
 
 The viewer is static and makes no model calls. GitHub Pages needs a deployment workflow, `VITE_BASE_PATH=/<repository-name>/` for a project site, and a production build. The viewer's bundled resources use the Vite base URL. `vite preview` is a local verification server, not production hosting.
 
+## Azure Linux App Service option
+
+The current site is a React/Vite static viewer; the model runner and MCP stdio server are local tools, not part of a hosted backend. The repository has no production HTTP server, container definition, or Azure deployment workflow yet. `pnpm build` creates `apps/web/dist`; `pnpm preview` is for local review only. A Linux App Service deployment needs a production static-file server or container that serves this build on App Service's `PORT`, followed by a smoke test of assets, replay files, and hash-based routes. An existing Linux App Service plan can host the app, but plan capacity alone does not create or configure a web app. Confirm the target app, domain, TLS, and deployment path before making any Azure changes.
+
 ## Release wording
 
-Describe 0.1.0 as an experimental agent research simulator. Disclose the initial one-model, six-run GPT-5.6 Luna evaluation, its estimated cost, and the limits of replay-based model provenance. Scripted demos are not LLM results. Do not claim calibrated physical behavior, universal model superiority, or an independently audited benchmark.
+Describe 0.1.0 as an experimental agent research simulator. Disclose the current Foundry evaluations, their estimated costs, and the limits of replay-based model provenance. Scripted demos are not LLM results. Do not claim calibrated physical behavior, universal model superiority, or an independently audited benchmark.

@@ -430,6 +430,14 @@ export interface LeaderboardEntry {
   costPerSuccessfulMission?: number;
   overallScore: number;
   watchRunReference?: string;
+  recordedRuns?: Array<{
+    scenarioSlug: string;
+    scenarioName: string;
+    attempt: number;
+    outcome: 'success' | 'failure';
+    score: number;
+    reference: string;
+  }>;
   source: 'official' | 'development-script';
   official: boolean;
 }

@@ -54,6 +54,7 @@ export interface LocalRunOptions {
   maxOutputTokens: number;
   maxToolCalls: number;
   requestTimeoutMs: number;
+  minRequestIntervalMs: number;
   inputPriceUsdPerMillion?: number;
   outputPriceUsdPerMillion?: number;
 }
@@ -99,6 +100,7 @@ export function parseLocalRunArgs(argv: string[]): LocalRunOptions {
         'max-output-tokens',
         'max-tool-calls',
         'request-timeout-ms',
+        'min-request-interval-ms',
         'input-price-usd-per-million',
         'output-price-usd-per-million',
       ].includes(name)
@@ -140,6 +142,7 @@ export function parseLocalRunArgs(argv: string[]): LocalRunOptions {
     throw new Error('--model is required: use a model or deployment available in your account.');
   const requestTimeoutMs = Math.trunc(parseNumber(values, 'request-timeout-ms', 30_000));
   if (requestTimeoutMs < 1) throw new Error('--request-timeout-ms must be positive.');
+  const minRequestIntervalMs = Math.trunc(parseNumber(values, 'min-request-interval-ms', 0));
   return {
     provider,
     model,
@@ -174,6 +177,7 @@ export function parseLocalRunArgs(argv: string[]): LocalRunOptions {
     maxOutputTokens: Math.trunc(parseNumber(values, 'max-output-tokens', 2_000)),
     maxToolCalls: Math.trunc(parseNumber(values, 'max-tool-calls', 60)),
     requestTimeoutMs,
+    minRequestIntervalMs,
     inputPriceUsdPerMillion: values.has('input-price-usd-per-million')
       ? parseNumber(values, 'input-price-usd-per-million', 0)
       : undefined,
@@ -383,6 +387,14 @@ async function callChatProvider(
   return JSON.parse(raw) as ProviderResponse;
 }
 
+let lastProviderRequestStartedAt = 0;
+
+async function waitForProviderRequest(minIntervalMs: number): Promise<void> {
+  const waitMs = minIntervalMs - (Date.now() - lastProviderRequestStartedAt);
+  if (waitMs > 0) await new Promise((resolve) => setTimeout(resolve, waitMs));
+  lastProviderRequestStartedAt = Date.now();
+}
+
 function usageFromResponse(response: ProviderResponse) {
   const inputTokens = response.usage?.prompt_tokens;
   const outputTokens = response.usage?.completion_tokens;
@@ -554,6 +566,7 @@ async function runLocal(options: LocalRunOptions): Promise<Run> {
             remainingUsd: 0,
           });
         const limits = nextProviderCall(options, usage, messages, tools, pricing);
+        await waitForProviderRequest(options.minRequestIntervalMs);
         const response = await callChatProvider(
           options,
           messages,

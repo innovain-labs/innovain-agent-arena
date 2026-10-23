@@ -76,6 +76,8 @@ export function App() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardArtifact | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const feed = useRef<HTMLDivElement>(null);
+  const arenaRef = useRef<HTMLElement>(null);
+  const focusArenaAfterRun = useRef(false);
   useEffect(() => {
     const updateRoute = () => {
       setRoute(resolveRoute(window.location.hash));
@@ -87,6 +89,14 @@ export function App() {
     window.addEventListener('hashchange', updateRoute);
     return () => window.removeEventListener('hashchange', updateRoute);
   }, []);
+  useEffect(() => {
+    if (!focusArenaAfterRun.current || !run || route !== 'arena') return;
+    focusArenaAfterRun.current = false;
+    const frame = window.requestAnimationFrame(() => {
+      arenaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [route, run]);
   useEffect(() => {
     if (runKind === 'custom') return;
     const controller = new AbortController();
@@ -224,6 +234,7 @@ export function App() {
         ),
       );
       if (!response.ok) throw new Error('Official benchmark replay could not be loaded.');
+      focusArenaAfterRun.current = true;
       setRun(validateRun(await response.json()));
       setRunKind('custom');
       setTime(0);
@@ -247,6 +258,10 @@ export function App() {
     }
   }, [run]);
   const targetHabitat = scenario?.objectives.stabilizeHabitat ?? 'B';
+  const provider = run?.metadata.model?.provider.toLowerCase();
+  const isModelRecording = !!run?.metadata.model && provider !== 'arena' && provider !== 'scripted';
+  const isScriptedRecording =
+    !run?.metadata.model && run?.metadata.agent.toLowerCase().startsWith('scripted');
 
   return (
     <div className={`app ${failure ? 'failed' : ''}`}>
@@ -315,7 +330,11 @@ export function App() {
                 <Radio size={13} />{' '}
                 {run?.metadata.protocol === 'browser/manual'
                   ? 'MANUAL PRACTICE'
-                  : 'RECORDED MCP RUN'}
+                  : isModelRecording
+                    ? 'RECORDED MODEL RUN'
+                    : isScriptedRecording || runKind !== 'custom'
+                      ? 'SCRIPTED DEMO · NO LLM'
+                      : 'SAVED RECORDING · MODEL UNKNOWN'}
               </span>
               <p>
                 Can an AI agent save the colony
@@ -329,7 +348,8 @@ export function App() {
               <div>
                 <span className="panel-kicker">CHOOSE AN EMERGENCY</span>
                 <p id="incident-selector-title">
-                  Review the objective and main risk, then watch a recorded rescue run.
+                  Choose an emergency to load its scripted example. Use the Leaderboard to inspect
+                  saved model runs.
                 </p>
               </div>
               <a className="inline-link" href={routeHref('scenarios')}>
@@ -394,7 +414,7 @@ export function App() {
               {error}
             </div>
           )}
-          <section className="arena">
+          <section className="arena" ref={arenaRef}>
             <MissionPanel
               state={state}
               run={run}
@@ -423,6 +443,17 @@ export function App() {
                   follow={follow}
                 />
               )}
+              <a
+                className="real-run-callout"
+                href={routeHref('leaderboard')}
+                aria-label="Open the Leaderboard to watch real LLM runs"
+              >
+                <span className="real-run-callout-label">REAL MODEL RUNS</span>
+                <span>Want to see an LLM handle an emergency?</span>
+                <strong>
+                  Explore the Leaderboard <ArrowUpRight size={13} />
+                </strong>
+              </a>
               <div className="view-controls">
                 <button
                   aria-label={follow ? 'Disable cinematic camera' : 'Enable cinematic camera'}
@@ -605,10 +636,12 @@ export function App() {
             </div>
             <div className="timeline-wrap">
               <div className="timeline-label">
-                <span>SIMULATION TIMELINE</span>
+                <span>RECORDED RUN TIMELINE</span>
                 <span>
                   {run?.events.filter((event) => event.type === 'tool_called').length ?? 0}{' '}
-                  {run?.metadata.protocol === 'browser/manual' ? 'MANUAL ACTIONS' : 'MCP ACTIONS'}
+                  {run?.metadata.protocol === 'browser/manual'
+                    ? 'MANUAL ACTIONS'
+                    : 'SAVED MCP ACTIONS'}
                 </span>
               </div>
               <div className="timeline">
@@ -662,13 +695,15 @@ export function App() {
                 value={runKind}
                 onChange={(event) => setRunKind(event.target.value)}
               >
-                <option value="rescue">Rescue run</option>
-                <option value="unsafe">Unsafe run</option>
+                <option value="rescue">Scripted rescue example</option>
+                <option value="unsafe">Scripted failure example</option>
                 {runKind === 'custom' && (
                   <option value="custom">
                     {run?.metadata.protocol === 'browser/manual'
                       ? 'Manual practice'
-                      : 'Imported run'}
+                      : isModelRecording
+                        ? 'Model recording'
+                        : 'Imported recording'}
                   </option>
                 )}
               </select>

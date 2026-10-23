@@ -32,8 +32,8 @@ export interface InnovainEvaluationManifest {
   };
   connection: {
     endpoint: string;
-    api: 'azure-openai-v1';
-    authentication: 'api-key (secret not retained)';
+    api: 'azure-openai-v1' | 'anthropic-messages-v1';
+    authentication: 'api-key (secret not retained)' | 'x-api-key (secret not retained)';
   };
   pricing: {
     id: string;
@@ -90,8 +90,12 @@ async function loadOfficialEvaluation(directory: string) {
     !manifest.model?.version ||
     !manifest.model?.deployment ||
     !manifest.connection?.endpoint ||
-    manifest.connection.api !== 'azure-openai-v1' ||
-    manifest.connection.authentication !== 'api-key (secret not retained)' ||
+    !(
+      (manifest.connection.api === 'azure-openai-v1' &&
+        manifest.connection.authentication === 'api-key (secret not retained)') ||
+      (manifest.connection.api === 'anthropic-messages-v1' &&
+        manifest.connection.authentication === 'x-api-key (secret not retained)')
+    ) ||
     !manifest.pricing?.id ||
     !manifest.budget ||
     !Array.isArray(manifest.runs)
@@ -119,6 +123,7 @@ async function loadOfficialEvaluation(directory: string) {
   );
   const attempts: ExperimentAttempt[] = [];
   const refs: string[] = [];
+  const recordedRuns: NonNullable<LeaderboardEntry['recordedRuns']> = [];
   const runCosts = [];
   for (const item of manifest.runs) {
     const key = `${item.scenarioSlug}/${item.attempt}`;
@@ -162,6 +167,14 @@ async function loadOfficialEvaluation(directory: string) {
     attempts.push({ attempt: attempts.length + 1, seed: item.seed, split: 'training', run });
     runCosts.push(run.metadata.cost);
     refs.push(resolve(directory, item.reference));
+    recordedRuns.push({
+      scenarioSlug: item.scenarioSlug,
+      scenarioName: incident.title,
+      attempt: item.attempt,
+      outcome: run.finalOutcome,
+      score: run.score.total,
+      reference: relative(benchmarkRoot, fullPath).replaceAll('\\', '/'),
+    });
   }
   if (expected.size > 0) throw new Error(`Missing canonical runs in ${manifestPath}`);
   const calculated = metrics(attempts);
@@ -216,6 +229,7 @@ async function loadOfficialEvaluation(directory: string) {
     costStatus: costs.status,
     overallScore: overallScore(calculated),
     watchRunReference: relative(benchmarkRoot, refs[0]!).replaceAll('\\', '/'),
+    recordedRuns,
     source: 'official',
     official: true,
   };

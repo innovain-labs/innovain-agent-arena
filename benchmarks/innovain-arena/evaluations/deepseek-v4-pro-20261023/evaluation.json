@@ -1,0 +1,56 @@
+{
+  "formatVersion": 1,
+  "benchmarkId": "innovain-mars-arena",
+  "benchmarkVersion": "mars-operations-v2",
+  "source": "official",
+  "official": true,
+  "verified": true,
+  "evaluatedAt": "2026-10-23T22:51:37.527Z",
+  "seed": 183,
+  "model": {
+    "provider": "Microsoft Foundry",
+    "model": "DeepSeek-V4-Pro",
+    "version": "2026-04-23",
+    "deployment": "deepseek-v4-pro-arena-test-20261023"
+  },
+  "connection": {
+    "endpoint": "https://laboratorytemp.openai.azure.com/openai/v1",
+    "api": "azure-openai-v1",
+    "authentication": "api-key (secret not retained)"
+  },
+  "pricing": {
+    "id": "azure-foundry-deepseek-v4-pro-2026-10-23-globalstandard",
+    "effectiveDate": "2026-10-23",
+    "inputUsdPerMillionTokens": 1.74,
+    "outputUsdPerMillionTokens": 3.48,
+    "source": "Microsoft Foundry DeepSeek V4 Pro Global Standard pricing, checked 2026-10-23"
+  },
+  "budget": {
+    "maxUsd": 2.4,
+    "maxInputTokens": 250000,
+    "maxOutputTokens": 100000,
+    "maxToolCalls": 30,
+    "attemptsPerIncident": 1,
+    "minRequestIntervalMs": 30000
+  },
+  "runs": [
+    {
+      "scenarioSlug": "habitat-b-leak-v2",
+      "attempt": 1,
+      "seed": 183,
+      "reference": "runs/habitat-b-leak-v2-attempt-01.json"
+    },
+    {
+      "scenarioSlug": "power-blackout-v2",
+      "attempt": 1,
+      "seed": 183,
+      "reference": "runs/power-blackout-v2-attempt-01.json"
+    },
+    {
+      "scenarioSlug": "oxygen-shortage-v2",
+      "attempt": 1,
+      "seed": 183,
+      "reference": "runs/oxygen-shortage-v2-attempt-01.json"
+    }
+  ]
+}

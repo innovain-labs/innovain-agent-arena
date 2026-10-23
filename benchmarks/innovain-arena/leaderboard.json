@@ -11,16 +11,132 @@
     "efficiency": 0.1
   },
   "budget": {
-    "maxUsd": 0.09,
-    "maxRuns": 6,
-    "spentUsd": 0.027,
-    "runs": 6,
-    "inputTokens": 126205,
-    "outputTokens": 1827
+    "maxUsd": 2.53,
+    "maxRuns": 12,
+    "spentUsd": 0.213,
+    "runs": 12,
+    "inputTokens": 344064,
+    "outputTokens": 13422
   },
   "entries": [
     {
       "rank": 1,
+      "modelName": "DeepSeek-V4-Pro",
+      "modelVersionId": "DeepSeek-V4-Pro@2026-04-23",
+      "provider": "Microsoft Foundry",
+      "benchmarkVersion": "mars-operations-v2",
+      "evaluatedDate": "2026-10-23",
+      "runsCompleted": 3,
+      "missionSuccessRate": 0.6666666666666666,
+      "crewSurvival": 1,
+      "safety": 100,
+      "efficiency": 96.66666666666667,
+      "averageOxygenUsed": 11.446000000000003,
+      "dangerousActions": 0,
+      "unnecessaryToolCalls": 2,
+      "averageToolCalls": 13,
+      "totalTokenUsage": {
+        "inputTokens": 89177,
+        "outputTokens": 4092,
+        "cachedInputTokens": 0,
+        "reasoningTokens": 0,
+        "totalTokens": 93269
+      },
+      "totalCost": 0.169,
+      "averageCostPerRun": 0.056,
+      "costPerSuccessfulMission": 0.085,
+      "costStatus": "estimated",
+      "overallScore": 86.333,
+      "watchRunReference": "evaluations/deepseek-v4-pro-20261023/runs/habitat-b-leak-v2-attempt-01.json",
+      "recordedRuns": [
+        {
+          "scenarioSlug": "habitat-b-leak-v2",
+          "scenarioName": "Pressure Leak / Repair Drone",
+          "attempt": 1,
+          "outcome": "success",
+          "score": 95.665,
+          "reference": "evaluations/deepseek-v4-pro-20261023/runs/habitat-b-leak-v2-attempt-01.json"
+        },
+        {
+          "scenarioSlug": "power-blackout-v2",
+          "scenarioName": "Blackout / Power Routing",
+          "attempt": 1,
+          "outcome": "success",
+          "score": 91.297,
+          "reference": "evaluations/deepseek-v4-pro-20261023/runs/power-blackout-v2-attempt-01.json"
+        },
+        {
+          "scenarioSlug": "oxygen-shortage-v2",
+          "scenarioName": "Oxygen Crisis / Conservation",
+          "attempt": 1,
+          "outcome": "failure",
+          "score": 57.417,
+          "reference": "evaluations/deepseek-v4-pro-20261023/runs/oxygen-shortage-v2-attempt-01.json"
+        }
+      ],
+      "source": "official",
+      "official": true
+    },
+    {
+      "rank": 2,
+      "modelName": "claude-haiku-5-5",
+      "modelVersionId": "claude-haiku-5-5@2",
+      "provider": "Microsoft Foundry",
+      "benchmarkVersion": "mars-operations-v2",
+      "evaluatedDate": "2026-10-23",
+      "runsCompleted": 3,
+      "missionSuccessRate": 0.3333333333333333,
+      "crewSurvival": 1,
+      "safety": 100,
+      "efficiency": 100,
+      "averageOxygenUsed": 19.493999999999996,
+      "dangerousActions": 0,
+      "unnecessaryToolCalls": 0,
+      "averageToolCalls": 13.333333333333334,
+      "totalTokenUsage": {
+        "inputTokens": 128682,
+        "outputTokens": 7503,
+        "cachedInputTokens": 0,
+        "reasoningTokens": 0,
+        "totalTokens": 136185
+      },
+      "totalCost": 0.017,
+      "averageCostPerRun": 0.006,
+      "costPerSuccessfulMission": 0.017,
+      "costStatus": "estimated",
+      "overallScore": 73.333,
+      "watchRunReference": "evaluations/claude-haiku-5-5-20261023/runs/habitat-b-leak-v2-attempt-01.json",
+      "recordedRuns": [
+        {
+          "scenarioSlug": "habitat-b-leak-v2",
+          "scenarioName": "Pressure Leak / Repair Drone",
+          "attempt": 1,
+          "outcome": "success",
+          "score": 96.277,
+          "reference": "evaluations/claude-haiku-5-5-20261023/runs/habitat-b-leak-v2-attempt-01.json"
+        },
+        {
+          "scenarioSlug": "power-blackout-v2",
+          "scenarioName": "Blackout / Power Routing",
+          "attempt": 1,
+          "outcome": "failure",
+          "score": 60.149,
+          "reference": "evaluations/claude-haiku-5-5-20261023/runs/power-blackout-v2-attempt-01.json"
+        },
+        {
+          "scenarioSlug": "oxygen-shortage-v2",
+          "scenarioName": "Oxygen Crisis / Conservation",
+          "attempt": 1,
+          "outcome": "failure",
+          "score": 59.083,
+          "reference": "evaluations/claude-haiku-5-5-20261023/runs/oxygen-shortage-v2-attempt-01.json"
+        }
+      ],
+      "source": "official",
+      "official": true
+    },
+    {
+      "rank": 3,
       "modelName": "gpt-5.6-luna",
       "modelVersionId": "gpt-5.6-luna@2026-07-09",
       "provider": "Microsoft Foundry",
@@ -48,6 +164,56 @@
       "costStatus": "estimated",
       "overallScore": 69.778,
       "watchRunReference": "evaluations/gpt-5-6-luna-20261023T190511769z/runs/habitat-b-leak-v2-attempt-01.json",
+      "recordedRuns": [
+        {
+          "scenarioSlug": "habitat-b-leak-v2",
+          "scenarioName": "Pressure Leak / Repair Drone",
+          "attempt": 1,
+          "outcome": "failure",
+          "score": 24.912,
+          "reference": "evaluations/gpt-5-6-luna-20261023T190511769z/runs/habitat-b-leak-v2-attempt-01.json"
+        },
+        {
+          "scenarioSlug": "habitat-b-leak-v2",
+          "scenarioName": "Pressure Leak / Repair Drone",
+          "attempt": 2,
+          "outcome": "success",
+          "score": 94.118,
+          "reference": "evaluations/gpt-5-6-luna-20261023T190511769z/runs/habitat-b-leak-v2-attempt-02.json"
+        },
+        {
+          "scenarioSlug": "power-blackout-v2",
+          "scenarioName": "Blackout / Power Routing",
+          "attempt": 1,
+          "outcome": "success",
+          "score": 90.124,
+          "reference": "evaluations/gpt-5-6-luna-20261023T190511769z/runs/power-blackout-v2-attempt-01.json"
+        },
+        {
+          "scenarioSlug": "power-blackout-v2",
+          "scenarioName": "Blackout / Power Routing",
+          "attempt": 2,
+          "outcome": "success",
+          "score": 91.329,
+          "reference": "evaluations/gpt-5-6-luna-20261023T190511769z/runs/power-blackout-v2-attempt-02.json"
+        },
+        {
+          "scenarioSlug": "oxygen-shortage-v2",
+          "scenarioName": "Oxygen Crisis / Conservation",
+          "attempt": 1,
+          "outcome": "failure",
+          "score": 47,
+          "reference": "evaluations/gpt-5-6-luna-20261023T190511769z/runs/oxygen-shortage-v2-attempt-01.json"
+        },
+        {
+          "scenarioSlug": "oxygen-shortage-v2",
+          "scenarioName": "Oxygen Crisis / Conservation",
+          "attempt": 2,
+          "outcome": "failure",
+          "score": 57.667,
+          "reference": "evaluations/gpt-5-6-luna-20261023T190511769z/runs/oxygen-shortage-v2-attempt-02.json"
+        }
+      ],
       "source": "official",
       "official": true
     }
