@@ -22,6 +22,6 @@ describe('public site routing', () => {
   it('opens a catalog incident from a shareable arena link', () => {
     expect(resolveRoute('#/?incident=power-blackout')).toBe('arena');
     expect(resolveIncident('#/?incident=power-blackout').number).toBe('002');
-    expect(resolveIncident('#/?incident=unknown').number).toBe('001');
+    expect(resolveIncident('#/?incident=unknown').displayNumber).toBe('001');
   });
 });

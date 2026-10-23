@@ -7,7 +7,7 @@ export function safeChildEnvironment(
     Object.entries(environment).filter(
       (entry): entry is [string, string] =>
         entry[1] !== undefined &&
-        !excludedNames.includes(entry[0]) &&
+        !excludedNames.some((name) => name.toLowerCase() === entry[0].toLowerCase()) &&
         !/(key|token|secret|password|credential)/i.test(entry[0]),
     ),
   );

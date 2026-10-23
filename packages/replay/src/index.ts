@@ -10,6 +10,8 @@ const habitat = z.object({
   oxygenFlow: z.number().finite().nonnegative(),
 });
 const state = z.object({
+  consumptionMode: z.enum(['normal', 'emergency']).optional(),
+  powerRerouted: z.boolean().optional(),
   time: z.number().int().nonnegative(),
   sol: z.number().int().nonnegative(),
   oxygenReserve: percentage,
@@ -39,10 +41,11 @@ const runSchema = z.object({
     scenarioId: z.string(),
     scenarioName: z.string(),
     scenarioVersion: z.number().int().positive().optional(),
+    toolContractVersion: z.enum(['mars-mcp-v1', 'mars-mcp-v2']).optional(),
     agent: z.string(),
     seed: z.number().int(),
     recordedAt: z.string(),
-    protocol: z.literal('MCP/stdio'),
+    protocol: z.enum(['MCP/stdio', 'browser/manual']),
     briefing: z.string(),
     scenario: z.unknown(),
     experimentId: z.string().optional(),

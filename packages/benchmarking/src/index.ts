@@ -429,8 +429,8 @@ export interface LeaderboardEntry {
   costPerSuccessfulMission?: number;
   overallScore: number;
   watchRunReference?: string;
-  source: 'official';
-  official: true;
+  source: 'official' | 'development-script';
+  official: boolean;
 }
 
 export interface LeaderboardArtifact {
@@ -438,7 +438,8 @@ export interface LeaderboardArtifact {
   benchmarkId: string;
   benchmarkVersion: string;
   generatedAt: string;
-  officialOnly: true;
+  officialOnly: boolean;
+  developmentFixtures?: boolean;
   scoring: typeof OVERALL_SCORE_WEIGHTS;
   budget: {
     maxUsd: number;

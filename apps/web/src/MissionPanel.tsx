@@ -44,7 +44,9 @@ export function MissionPanel({
     <aside className="mission-panel">
       <div className="panel-kicker">
         <span>ACTIVE SCENARIO</span>
-        <span className="orange">{incident?.number ?? 'LOCAL'}</span>
+        <span className="orange">
+          {incident?.number ? `INCIDENT ${incident.displayNumber}` : 'LOCAL REPLAY'}
+        </span>
       </div>
       <div className="incident-number">
         MARS<span> / {state?.sol ?? '—'}</span>
@@ -95,7 +97,39 @@ export function MissionPanel({
           </span>
           Stabilize Habitat {target}
         </div>
+        {scenario?.objectives.requireRepair && (
+          <div>
+            <span
+              className={state?.habitats[target].leakRate === 0 ? 'objective done' : 'objective'}
+            >
+              04
+            </span>
+            Seal the leak with a repair drone
+          </div>
+        )}
+        {scenario?.objectives.requirePowerReroute && (
+          <div>
+            <span className={state?.powerRerouted ? 'objective done' : 'objective'}>04</span>Reroute
+            nonessential power
+          </div>
+        )}
+        {scenario?.objectives.requireConservation && (
+          <div>
+            <span
+              className={state?.consumptionMode === 'emergency' ? 'objective done' : 'objective'}
+            >
+              05
+            </span>
+            Enable emergency conservation
+          </div>
+        )}
       </div>
+      {scenario?.rulesVersion === 2 && (
+        <p className="operations-status">
+          OXYGEN MODE: {state?.consumptionMode?.toUpperCase() ?? 'NORMAL'} · POWER ROUTING:{' '}
+          {state?.powerRerouted ? 'ACTIVE' : 'AVAILABLE'}
+        </p>
+      )}
       <div className="agent-profile">
         <div className="panel-kicker">AGENT</div>
         <strong>
@@ -105,11 +139,13 @@ export function MissionPanel({
             : (run?.metadata.agent ?? 'Loading agent')}
         </strong>
         <small>
-          {run?.metadata.model &&
-          run.metadata.model.provider !== 'arena' &&
-          run.metadata.model.provider !== 'scripted'
-            ? 'Recorded model run · real MCP / stdio'
-            : 'Scripted baseline · real MCP / stdio'}
+          {run?.metadata.protocol === 'browser/manual'
+            ? 'Human practice · browser simulation'
+            : run?.metadata.model &&
+                run.metadata.model.provider !== 'arena' &&
+                run.metadata.model.provider !== 'scripted'
+              ? 'Recorded model run · real MCP / stdio'
+              : 'Scripted baseline · real MCP / stdio'}
         </small>
       </div>
       <div className="run-cost" aria-label="Run economics">
@@ -146,7 +182,11 @@ export function MissionPanel({
         <ArrowUpRight size={17} />
       </button>
       {typeof stopReason === 'string' && <p className="run-stop">{stopReason}</p>}
-      <small className="no-model">Replay only. This browser makes no live model calls.</small>
+      <small className="no-model">
+        {run?.metadata.protocol === 'browser/manual'
+          ? 'Live browser practice. No AI model or MCP transport.'
+          : 'Replay only. This browser makes no live model calls.'}
+      </small>
     </aside>
   );
 }

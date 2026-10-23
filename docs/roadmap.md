@@ -10,6 +10,14 @@
 - Clearly disclosed scripted benchmark baselines; no published real LLM comparisons yet.
 - Apache-2.0, contributor guidance, security guidance, issue/PR templates, dependency updates, and CI.
 
+## Operations v2 implemented locally
+
+- Three versioned v2 incidents with leak repair, power routing and consumption control.
+- Twelve real MCP demo recordings across legacy and v2; original v1 bytes retained.
+- Manual browser practice with state-driven 3D consequences and explicit human labeling.
+- Separate reviewed-file Community Top 10 with canonical replay/score verification and self-reported model labels.
+- [Hosted key-local architecture](public-arena-architecture.md) proposed; remote transport, sign-in, pairing and live spectating still require implementation and deployment.
+
 ## Before public release
 
 1. Create an Innovain GitHub organization using individual personal accounts; choose the available organization/repository name.

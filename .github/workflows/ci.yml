@@ -20,5 +20,7 @@ jobs:
       - run: pnpm audit
       - run: pnpm scenario:validate
       - run: pnpm check
+      - run: pnpm community:build
+      - run: git diff --exit-code -- apps/web/public/community
       - run: pnpm runs:verify
       - run: git diff --exit-code -- runs apps/web/public/runs

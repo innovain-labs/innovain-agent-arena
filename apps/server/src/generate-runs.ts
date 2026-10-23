@@ -30,7 +30,8 @@ for (const incident of marsIncidents) {
           ARENA_RECORD_PATH: recordPath,
         },
       );
-      if (tools.tools.length !== 9) throw new Error('Expected all nine Mars MCP tools.');
+      if (tools.tools.length !== (scenario.rulesVersion === 2 ? 12 : 9))
+        throw new Error('Unexpected Mars MCP tool contract.');
       for (const call of plan) {
         const result = await session.call(call);
         if (!result.ok && id === 'rescue')
@@ -50,6 +51,9 @@ for (const incident of marsIncidents) {
       metadata: {
         id: `incident-${incident.number}-${id}`,
         scenarioId: scenario.metadata.id,
+        ...(scenario.rulesVersion === 2
+          ? { scenarioVersion: 2, toolContractVersion: 'mars-mcp-v2' as const, official: false }
+          : {}),
         scenarioName: scenario.metadata.name,
         agent: id === 'rescue' ? 'Scripted / cautious rescue' : 'Scripted / unsafe intervention',
         seed: 183,

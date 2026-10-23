@@ -1,3 +1,4 @@
+import { PracticePanel } from './PracticePanel';
 import { MissionPanel } from './MissionPanel';
 import { Telemetry, EventItem, WorldBanner } from './ReplayPanels';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -19,7 +20,7 @@ import {
   Zap,
 } from 'lucide-react';
 import type { Run } from '@arena/arena-core';
-import { marsIncidents, parseScenario } from '@arena/mars-world';
+import { currentMarsIncidents, marsIncidents, parseScenario } from '@arena/mars-world';
 import { durationOf, frameAt, validateRun } from '@arena/replay';
 import { ColonyScene } from './ColonyScene';
 import { ExperimentPanel } from './ExperimentPanel';
@@ -44,6 +45,9 @@ const actionEvents = new Set([
   'crew_moved',
   'habitat_isolated',
   'oxygen_rerouted',
+  'leak_repaired',
+  'power_rerouted',
+  'consumption_changed',
   'world_modifier',
   'mission_succeeded',
   'mission_failed',
@@ -133,7 +137,7 @@ export function App() {
   }, []);
   useEffect(() => {
     const controller = new AbortController();
-    fetch(assetUrl('benchmarks/mars-standard-v1/leaderboard.json'), { signal: controller.signal })
+    fetch(assetUrl('benchmarks/innovain-arena/leaderboard.json'), { signal: controller.signal })
       .then((response) => {
         if (!response.ok) throw new Error('Official benchmark leaderboard could not be loaded.');
         return response.json();
@@ -212,7 +216,13 @@ export function App() {
   };
   const openLeaderboardRun = async (reference: string) => {
     try {
-      const response = await fetch(assetUrl(`benchmarks/mars-standard-v1/${reference}`));
+      const response = await fetch(
+        assetUrl(
+          /^(community\/entry-\d+-\d+|runs\/(example|unsafe)-incident-\d+)\.json$/.test(reference)
+            ? reference
+            : `benchmarks/innovain-arena/${reference}`,
+        ),
+      );
       if (!response.ok) throw new Error('Official benchmark replay could not be loaded.');
       setRun(validateRun(await response.json()));
       setRunKind('custom');
@@ -298,11 +308,14 @@ export function App() {
               <h1>
                 AI decisions. <em>Real consequences.</em>
               </h1>
-              <p>You don't play Agent Arena. AI agents do.</p>
+              <p>Watch AI agents. Take the controls. Every decision has a cost.</p>
             </div>
             <div className="masthead-right">
               <span className="live-label">
-                <Radio size={13} /> RECORDED MCP RUN
+                <Radio size={13} />{' '}
+                {run?.metadata.protocol === 'browser/manual'
+                  ? 'MANUAL PRACTICE'
+                  : 'RECORDED MCP RUN'}
               </span>
               <p>
                 Can an AI agent save the colony
@@ -311,36 +324,71 @@ export function App() {
               </p>
             </div>
           </section>
-          <section className="incident-picker" aria-label="Emergency selection">
-            <div>
-              <span className="panel-kicker">CHOOSE AN EMERGENCY</span>
-              <p>Three incidents. Different decisions. Recorded MCP consequences.</p>
+          <section className="incident-selector" aria-labelledby="incident-selector-title">
+            <div className="incident-selector-heading">
+              <div>
+                <span className="panel-kicker">CHOOSE AN EMERGENCY</span>
+                <p id="incident-selector-title">
+                  Review the objective and main risk, then watch a recorded rescue run.
+                </p>
+              </div>
+              <a className="inline-link" href={routeHref('scenarios')}>
+                Full scenario catalog <ArrowUpRight size={14} />
+              </a>
             </div>
-            <label>
-              <select
-                aria-label="Choose emergency"
-                value={runKind === 'custom' ? 'custom' : incident.slug}
-                onChange={(event) => {
-                  const selected = marsIncidents.find((item) => item.slug === event.target.value);
-                  if (selected) {
-                    setIncident(selected);
-                    setRunKind('rescue');
-                    window.location.hash = `#/?incident=${selected.slug}`;
-                  }
-                }}
-              >
-                {marsIncidents.map((item) => (
-                  <option key={item.slug} value={item.slug}>
-                    {item.number} · {item.title}
-                  </option>
-                ))}
-                {runKind === 'custom' && (
-                  <option value="custom">Recorded run · {run?.metadata.scenarioName}</option>
-                )}
-              </select>
-              <ChevronDown size={14} />
-            </label>
+            <div className="incident-card-grid">
+              {currentMarsIncidents.map((item) => {
+                const selected = runKind !== 'custom' && incident.slug === item.slug;
+                return (
+                  <button
+                    aria-pressed={selected}
+                    className={`incident-card${selected ? ' selected' : ''}`}
+                    key={item.slug}
+                    onClick={() => {
+                      setIncident(item);
+                      setRunKind('rescue');
+                      setTime(0);
+                      setPlaying(false);
+                      window.location.hash = `#/?incident=${item.slug}`;
+                    }}
+                    type="button"
+                  >
+                    <span className="incident-card-topline">
+                      <span>INCIDENT {item.displayNumber}</span>
+                      <span>MARS OPERATIONS · 12 TOOLS</span>
+                    </span>
+                    <strong className="incident-card-title">{item.title}</strong>
+                    <span className="incident-card-summary">{item.summary}</span>
+                    <span className="incident-card-detail">
+                      <span>MISSION OBJECTIVE</span>
+                      {item.objective}
+                    </span>
+                    <span className="incident-card-detail risk">
+                      <span>KEY DECISION</span>
+                      {item.keyDecision}
+                    </span>
+                    <span className="incident-card-action">
+                      {selected ? 'Rescue recording selected' : 'Watch rescue recording'}
+                      <ArrowUpRight size={14} />
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </section>
+          {scenario && run && (
+            <PracticePanel
+              key={run.metadata.scenarioId}
+              scenario={scenario}
+              source={run}
+              onRun={(practice) => {
+                setRun(practice);
+                setRunKind('custom');
+                setTime(durationOf(practice));
+                setPlaying(false);
+              }}
+            />
+          )}
           {error && (
             <div className="error" role="alert">
               {error}
@@ -559,8 +607,8 @@ export function App() {
               <div className="timeline-label">
                 <span>SIMULATION TIMELINE</span>
                 <span>
-                  {run?.events.filter((event) => event.type === 'tool_called').length ?? 0} MCP
-                  ACTIONS
+                  {run?.events.filter((event) => event.type === 'tool_called').length ?? 0}{' '}
+                  {run?.metadata.protocol === 'browser/manual' ? 'MANUAL ACTIONS' : 'MCP ACTIONS'}
                 </span>
               </div>
               <div className="timeline">
@@ -616,7 +664,13 @@ export function App() {
               >
                 <option value="rescue">Rescue run</option>
                 <option value="unsafe">Unsafe run</option>
-                {runKind === 'custom' && <option value="custom">Imported run</option>}
+                {runKind === 'custom' && (
+                  <option value="custom">
+                    {run?.metadata.protocol === 'browser/manual'
+                      ? 'Manual practice'
+                      : 'Imported run'}
+                  </option>
+                )}
               </select>
               <ChevronDown size={12} />
             </label>
@@ -668,9 +722,9 @@ export function App() {
                 'Choose an emergency to load its public mission briefing.'}
             </p>
             <p>
-              Agents discover and call nine available tools over MCP stdio. The world calculates
-              outcomes. This page plays the recorded event log and snapshots; no model is running in
-              your browser.
+              Agents discover the available tools over MCP stdio. The world calculates outcomes.
+              This page plays recorded actions and state changes; no model is running in your
+              browser.
             </p>
             <p>
               Compare the rescue and unsafe recordings. Scrub the timeline to inspect actions and

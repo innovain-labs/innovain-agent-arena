@@ -1,10 +1,11 @@
+import { CommunityLeaderboard } from './CommunityLeaderboard';
 import type { ExperimentSummary } from '@arena/experiments';
 import type { LeaderboardArtifact } from '@arena/benchmarking';
 import { ArrowUpRight, FileUp, Github, LockKeyhole, Terminal, ExternalLink } from 'lucide-react';
 import { ExperimentPanel } from './ExperimentPanel';
 import { LeaderboardPanel } from './LeaderboardPanel';
 import { assetUrl, routeHref, type SiteRoute } from './site';
-import { marsIncidents } from '@arena/mars-world';
+import { currentMarsIncidents } from '@arena/mars-world';
 
 interface PublicPageProps {
   route: Exclude<SiteRoute, 'arena'>;
@@ -39,23 +40,26 @@ export function PublicPage({
     return (
       <main className="public-page">
         <div className="page-heading">
-          <span className="eyebrow">STANDARD ARENA / VERIFIED ARTIFACTS</span>
-          <h1>Leaderboard</h1>
+          <span className="eyebrow">INNOVAIN + COMMUNITY</span>
+          <h1>Leaderboards</h1>
           <p>
-            Comparable, versioned results from the same scenario family, seeds, evaluator, and MCP
-            contract.
+            {leaderboard?.developmentFixtures
+              ? 'Development examples and community replays from the three Mars emergencies.'
+              : 'Verified model evaluations and community replays from the three Mars emergencies.'}
           </p>
         </div>
         {leaderboard ? (
           <LeaderboardPanel leaderboard={leaderboard} onWatchRun={onWatchRun} />
         ) : (
-          <p className="loading">Loading official results…</p>
+          <p className="loading">Loading Innovain results…</p>
         )}
+        <CommunityLeaderboard onWatchRun={onWatchRun} />
         <div className="notice-card">
-          <strong>Official versus community</strong>
+          <strong>Innovain and community</strong>
           <span>
-            Official entries are generated from verified artifacts. Imported local runs are clearly
-            marked and never change this board.
+            {leaderboard?.developmentFixtures
+              ? 'Innovain currently shows temporary scripted examples for development. Community submissions follow a separate reviewed publication process.'
+              : 'The Innovain board is reserved for verified real-model evaluations. Local practice and community submissions are shown separately.'}
           </span>
         </div>
       </main>
@@ -72,14 +76,14 @@ export function PublicPage({
         </div>
         <div className="research-grid">
           <article className="research-card">
-            <span className="panel-kicker">STANDARD ARENA</span>
-            <h2>Clean-state comparison</h2>
+            <span className="panel-kicker">REAL-MODEL EVALUATION</span>
+            <h2>Comparable runs</h2>
             <p>
-              Each model sees the same public briefing, tools, deterministic variants, and host-side
-              scoring. The model chooses actions; the trusted simulator decides what they do.
+              Reliable comparisons use the same emergencies, tools, and scoring. The Innovain Top 10
+              will show verified model runs; browser practice and community replays stay separate.
             </p>
             <a className="inline-link" href={routeHref('leaderboard')}>
-              View verified leaderboard <ArrowUpRight size={14} />
+              View Innovain Top 10 <ArrowUpRight size={14} />
             </a>
           </article>
           <article className="research-card">
@@ -134,14 +138,27 @@ export function PublicPage({
           </p>
         </div>
         <section className="scenario-list">
-          {marsIncidents.map((incident) => (
+          {currentMarsIncidents.map((incident) => (
             <article className="scenario-card active" key={incident.slug}>
               <div>
-                <span className="scenario-status">SHIPPED / ACTIVE</span>
+                <span className="scenario-status">MARS OPERATIONS · 12 TOOLS</span>
                 <h2>
-                  Incident {incident.number} · {incident.title}
+                  Incident {incident.displayNumber} · {incident.title}
                 </h2>
-                <p>{incident.summary} Rescue and failure recordings are included.</p>
+                <p>{incident.summary}</p>
+                <div className="scenario-details">
+                  <p>
+                    <strong>Mission objective</strong>
+                    {incident.objective}
+                  </p>
+                  <p>
+                    <strong>Key decision</strong>
+                    {incident.keyDecision}
+                  </p>
+                </div>
+                <span className="scenario-recordings">
+                  Recorded rescue and unsafe runs included
+                </span>
               </div>
               <a className="watch-button" href={`#/?incident=${incident.slug}`}>
                 Open arena <ArrowUpRight size={16} />
@@ -183,8 +200,8 @@ export function PublicPage({
           <span className="eyebrow">LOCAL RUNNER / YOUR MACHINE</span>
           <h1>Try Your Model</h1>
           <p>
-            Run an agent against the Mars MCP server locally, then open the resulting JSON replay in
-            this browser.
+            Download the local runner, connect your provider, and play all three emergencies. Your
+            API key stays on your computer. Reviewed results enter Community Top 10 only.
           </p>
         </div>
         <div className="try-grid">
@@ -192,22 +209,38 @@ export function PublicPage({
             <div className="command-label">
               <Terminal size={15} /> QUICK START
             </div>
+            <a
+              className="watch-button"
+              href={assetUrl('downloads/agent-arena-runner.zip')}
+              download
+            >
+              Download local runner · ZIP
+            </a>
+            <p>
+              Extract the ZIP and install Node.js 24. No source checkout or pnpm is needed. Open a
+              terminal in the extracted folder:
+            </p>
             <pre>
-              <code>
-                pnpm arena:run -- --provider scripted --model scripted-rescue --output
-                runs/my-run.json
-              </code>
+              <code>node arena.mjs suite --provider scripted --entrant your-handle</code>
             </pre>
             <p>
-              Set provider credentials only in your local environment. Azure Foundry and other
-              compatible services use the <code>openai-compatible</code> provider. Pricing is
-              optional for local tests; without it, Agent Arena records token usage and labels the
-              replay unpriced. Ollama uses <code>http://127.0.0.1:11434</code> and never needs a
-              key.
+              First test without a key using scripted mode. Then select OpenAI, Claude, DeepSeek,
+              Foundry, Ollama, or an OpenAI-compatible endpoint. Set credentials only in your local
+              environment. Pricing is optional for local tests; without it, Agent Arena records
+              token usage and labels the replay unpriced. Ollama uses{' '}
+              <code>http://127.0.0.1:11434</code> and never needs a key.
             </p>
             <button className="watch-button" onClick={onOpenLocalRun}>
               <FileUp size={15} /> Open local run.json
             </button>
+            <p>
+              Verify with <code>node arena.mjs verify --directory arena-results</code>, review the
+              files, then submit via a GitHub pull request. Importing a replay here does not publish
+              it.
+            </p>
+            <a className="inline-link" href={assetUrl('docs/community-leaderboard.md')}>
+              Community verification and submission guide
+            </a>
           </section>
           <section className="security-card">
             <LockKeyhole size={21} />
@@ -222,6 +255,40 @@ export function PublicPage({
             </a>
           </section>
         </div>
+        <section className="copy-section">
+          <span className="eyebrow">MCP OPERATIONS</span>
+          <h2>Three decisions. Real state changes.</h2>
+          <div className="idea-grid">
+            <article className="research-card">
+              <code>repair_leak(habitat)</code>
+              <p>
+                Evacuate and isolate first. A powered drone seals the leak in 4 simulation seconds;
+                pressure still needs restoring.
+              </p>
+            </article>
+            <article className="research-card">
+              <code>reroute_power()</code>
+              <p>
+                Disconnect nonessential services to redirect up to 20 power units. One use per
+                mission, 2 seconds; unnecessary use reduces safety.
+              </p>
+            </article>
+            <article className="research-card">
+              <code>set_consumption_mode(mode)</code>
+              <p>
+                Emergency mode cuts baseline oxygen consumption by 75%. It takes 2 seconds and
+                leaves leaks and routed supply unchanged.
+              </p>
+            </article>
+          </div>
+          <p>
+            The three observation tools and six existing controls remain available. All models
+            receive the same twelve tools, including actions that may be unsafe in context.
+          </p>
+          <a className="inline-link" href={assetUrl('docs/mcp-tools.md')}>
+            Read the full MCP tool catalog
+          </a>
+        </section>
         <section className="provider-table">
           <span className="eyebrow">SUPPORTED PROVIDERS</span>
           <div className="provider-row">
@@ -238,6 +305,21 @@ export function PublicPage({
             <strong>OpenAI</strong>
             <span>Remote API called only by your local runner</span>
             <code>--provider openai</code>
+          </div>
+          <div className="provider-row">
+            <strong>Claude / Anthropic</strong>
+            <span>Native Messages API and tool use</span>
+            <code>--provider anthropic</code>
+          </div>
+          <div className="provider-row">
+            <strong>DeepSeek</strong>
+            <span>Direct provider API</span>
+            <code>--provider deepseek</code>
+          </div>
+          <div className="provider-row">
+            <strong>Azure Foundry</strong>
+            <span>Your deployment and resource endpoint</span>
+            <code>--provider foundry</code>
           </div>
           <div className="provider-row">
             <strong>OpenAI-compatible</strong>

@@ -22,4 +22,4 @@ if (
   throw new Error(
     'Recordings are inconsistent with source or viewer copies. Review generated changes and run verification again.',
   );
-console.log('All six real MCP recordings reproduce byte-for-byte and viewer copies match.');
+console.log('All versioned real MCP recordings reproduce byte-for-byte and viewer copies match.');

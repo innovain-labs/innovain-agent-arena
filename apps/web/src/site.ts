@@ -1,4 +1,4 @@
-import { marsIncidents } from '@arena/mars-world';
+import { currentMarsIncidents, marsIncidents } from '@arena/mars-world';
 export type SiteRoute =
   'arena' | 'leaderboard' | 'research' | 'scenarios' | 'try-your-model' | 'about';
 
@@ -29,7 +29,11 @@ export function resolveRoute(hash: string): SiteRoute {
 }
 export function resolveIncident(hash: string): (typeof marsIncidents)[number] {
   const slug = new URLSearchParams(hash.split('?')[1] ?? '').get('incident');
-  return marsIncidents.find((incident) => incident.slug === slug) ?? marsIncidents[0];
+  return (
+    marsIncidents.find((incident) => incident.slug === slug) ??
+    currentMarsIncidents[0] ??
+    marsIncidents[0]
+  );
 }
 
 export const assetUrl = (path: string) => `${import.meta.env.BASE_URL}${path.replace(/^\//, '')}`;

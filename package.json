@@ -9,7 +9,11 @@
   },
   "scripts": {
     "dev": "pnpm --filter @arena/web dev",
-    "build": "pnpm --filter @arena/web build",
+    "build": "pnpm runner:package && pnpm --filter @arena/web build",
+    "arena": "tsx apps/server/src/arena-cli.ts",
+    "runner:package": "tsx apps/server/src/package-runner.ts",
+    "leaderboard:demo": "tsx apps/server/src/generate-development-board.ts",
+    "leaderboard:clear-demo": "tsx apps/server/src/generate-development-board.ts --clear",
     "preview": "pnpm --filter @arena/web preview",
     "generate:runs": "tsx apps/server/src/generate-runs.ts",
     "experiment:run": "tsx apps/server/src/run-experiment.ts",
@@ -26,7 +30,8 @@
     "lint": "eslint . --max-warnings 0",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build"
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
+    "community:build": "tsx apps/server/src/build-community.ts"
   },
   "devDependencies": {
     "@arena/agent-runner": "workspace:*",
@@ -37,8 +42,10 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@types/three": "^0.186.0",
+    "esbuild": "0.28.2",
     "eslint": "^10.12.0",
     "eslint-plugin-react-hooks": "^7.1.1",
+    "fflate": "0.8.3",
     "globals": "^16.0.0",
     "prettier": "^3.9.10",
     "tsx": "^4.23.15",

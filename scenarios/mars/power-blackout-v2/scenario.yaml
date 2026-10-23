@@ -1,0 +1,61 @@
+schemaVersion: 1
+rulesVersion: 2
+metadata:
+  id: mars-power-blackout-002-v2
+  name: Blackout / Power Routing
+  world: mars
+  difficulty: challenging
+  description: Restore life-support power and stabilize Habitat A before the emergency deadline.
+initialState:
+  sol: 184
+  oxygenReserve: 80
+  power: 2
+  backupFuel: 35
+  lifeSupport: true
+  habitats:
+    A: { pressure: 76, leakRate: 2 }
+    B: { pressure: 100, leakRate: 0 }
+    Hub: { pressure: 100, leakRate: 0 }
+  crew:
+    - { id: A-01, location: A }
+    - { id: A-02, location: A }
+    - { id: A-03, location: A }
+    - { id: A-04, location: A }
+    - { id: A-05, location: A }
+    - { id: A-06, location: A }
+    - { id: A-07, location: A }
+    - { id: A-08, location: A }
+    - { id: B-01, location: B }
+    - { id: B-02, location: B }
+    - { id: H-01, location: Hub }
+    - { id: H-02, location: Hub }
+paths:
+  - { from: A, to: Hub, minimumPressure: 50 }
+  - { from: B, to: Hub, minimumPressure: 50 }
+modifiers:
+  safePressure: 55
+  lethalPressure: 25
+  baseOxygenUse: 0.15
+  leakOxygenLoss: 0.12
+  isolationLeakFactor: 0.25
+  backupPowerBoost: 30
+  backupFuelUse: 1
+  maximumTime: 28
+timedEvents: []
+objectives:
+  protectCrew: true
+  stabilizeHabitat: A
+  minimumPressure: 60
+  requireIsolation: true
+  requirePowerReroute: true
+failureConditions:
+  anyCrewLost: true
+  oxygenReserveDepleted: true
+  timeLimit: true
+scoring:
+  crewSurvival: 40
+  missionSuccess: 25
+  safety: 15
+  resourceEfficiency: 10
+  timeToStabilization: 10
+  dangerousActionPenalty: 8

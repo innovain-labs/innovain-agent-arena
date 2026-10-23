@@ -13,6 +13,7 @@ const habitat = z
 export const scenarioSchema = z
   .object({
     schemaVersion: z.literal(1),
+    rulesVersion: z.literal(2).optional(),
     metadata: z
       .object({
         id: z.string().min(1),
@@ -77,6 +78,9 @@ export const scenarioSchema = z
         stabilizeHabitat: habitatId,
         minimumPressure: percentage,
         requireIsolation: z.boolean(),
+        requireRepair: z.boolean().optional(),
+        requirePowerReroute: z.boolean().optional(),
+        requireConservation: z.boolean().optional(),
       })
       .strict(),
     failureConditions: z
@@ -106,6 +110,13 @@ export const scenarioSchema = z
       scenario.initialState.crew.length
     )
       context.addIssue({ code: 'custom', message: 'Crew IDs must be unique.' });
+    if (
+      !scenario.rulesVersion &&
+      (scenario.objectives.requireRepair ||
+        scenario.objectives.requirePowerReroute ||
+        scenario.objectives.requireConservation)
+    )
+      context.addIssue({ code: 'custom', message: 'Extended objectives require Mars rules v2.' });
     const weights = scenario.scoring;
     if (
       weights.crewSurvival +

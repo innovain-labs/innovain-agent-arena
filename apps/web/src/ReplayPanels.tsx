@@ -44,7 +44,7 @@ export function EventItem({ event }: { event: ArenaEvent }) {
     >
       <div className="event-meta">
         <span>
-          {action ? 'AGENT ACTION' : result ? 'TOOL RESULT' : danger ? 'WARNING' : 'WORLD EVENT'}
+          {action ? 'TOOL CALL' : result ? 'TOOL RESULT' : danger ? 'WARNING' : 'WORLD EVENT'}
         </span>
         <time>{clock(event.time)}</time>
       </div>
@@ -97,7 +97,7 @@ export function WorldBanner({
         <p>{state.outcomeReason}</p>
         {state.outcome === 'failure' && lastAction && (
           <code>
-            Last recorded MCP action: {String(lastAction.data.name)}(
+            Last recorded action: {String(lastAction.data.name)}(
             {JSON.stringify(lastAction.data.arguments)})
           </code>
         )}

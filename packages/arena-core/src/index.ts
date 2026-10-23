@@ -33,6 +33,8 @@ export interface CrewMember {
   status: 'safe' | 'at-risk' | 'lost';
 }
 export interface WorldState {
+  consumptionMode?: 'normal' | 'emergency';
+  powerRerouted?: boolean;
   time: number;
   sol: number;
   oxygenReserve: number;
@@ -84,10 +86,11 @@ export interface Run {
     scenarioId: string;
     scenarioName: string;
     scenarioVersion?: number;
+    toolContractVersion?: 'mars-mcp-v1' | 'mars-mcp-v2';
     agent: string;
     seed: number;
     recordedAt: string;
-    protocol: 'MCP/stdio';
+    protocol: 'MCP/stdio' | 'browser/manual';
     briefing: string;
     scenario: unknown;
     experimentId?: string;

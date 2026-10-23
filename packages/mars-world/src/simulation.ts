@@ -10,6 +10,9 @@ import {
 import { parseScenario, type MarsScenario } from './scenario';
 
 const durations: Record<string, number> = {
+  repair_leak: 4,
+  reroute_power: 2,
+  set_consumption_mode: 2,
   get_colony_status: 1,
   inspect_habitat: 1,
   inspect_life_support: 1,
@@ -31,6 +34,9 @@ export class MarsSimulation {
     const initial = this.scenario.initialState;
     this.world = {
       ...clone(initial),
+      ...(scenario.rulesVersion === 2
+        ? { consumptionMode: 'normal' as const, powerRerouted: false }
+        : {}),
       time: 0,
       backupActive: false,
       backupContribution: 0,
@@ -43,6 +49,9 @@ export class MarsSimulation {
     this.updateCrew();
     this.evaluate();
     this.journal.capture(this.world);
+  }
+  get toolContractVersion() {
+    return this.scenario.rulesVersion === 2 ? ('mars-mcp-v2' as const) : ('mars-mcp-v1' as const);
   }
   get state(): WorldState {
     return clone(this.world);
@@ -72,7 +81,8 @@ export class MarsSimulation {
         }
       }
       const support = world.lifeSupport && world.power >= 20 && world.oxygenReserve > 0;
-      let consumption = this.scenario.modifiers.baseOxygenUse;
+      let consumption =
+        this.scenario.modifiers.baseOxygenUse * (world.consumptionMode === 'emergency' ? 0.25 : 1);
       let availableOxygen = Math.max(0, world.oxygenReserve - consumption);
       for (const id of ['A', 'B', 'Hub'] as const) {
         const habitat = world.habitats[id];
@@ -146,6 +156,9 @@ export class MarsSimulation {
     const effectiveLeak =
       target.leakRate * (target.isolated ? this.scenario.modifiers.isolationLeakFactor : 1);
     if (
+      (!objective.requireRepair || target.leakRate === 0) &&
+      (!objective.requirePowerReroute || world.powerRerouted === true) &&
+      (!objective.requireConservation || world.consumptionMode === 'emergency') &&
       world.crew.every((crew) => crew.status === 'safe') &&
       target.pressure >= objective.minimumPressure &&
       (!objective.requireIsolation || target.isolated) &&
@@ -181,7 +194,79 @@ export class MarsSimulation {
       ...(observation ? { observation } : {}),
     });
     const reject = (message: string): ToolResult => ({ ok: false, message });
+    if (
+      ['repair_leak', 'reroute_power', 'set_consumption_mode'].includes(call.name) &&
+      this.scenario.rulesVersion !== 2
+    ) {
+      const result = reject('Tool unavailable in Mars MCP v1.');
+      this.emit('tool_result', result.message, { name: call.name, ...result });
+      this.journal.capture(this.world);
+      return result;
+    }
     switch (call.name) {
+      case 'repair_leak':
+        if (
+          !habitat ||
+          !habitat.isolated ||
+          habitat.externalAirlockOpen ||
+          this.world.power < 20 ||
+          habitat.leakRate <= 0 ||
+          this.world.crew.some((crew) => crew.location === id && crew.status !== 'lost')
+        ) {
+          result = reject(
+            'Repair drone requires an evacuated, isolated habitat with a closed external airlock, an active leak, and power of at least 20.',
+          );
+          break;
+        }
+        habitat.leakRate = 0;
+        this.emit(
+          'leak_repaired',
+          `Repair drone sealed Habitat ${id}. Pressure must still be restored.`,
+          { habitat: id },
+        );
+        result = success('Leak sealed. Existing pressure and oxygen flow are unchanged.');
+        break;
+      case 'reroute_power':
+        if (this.world.powerRerouted) {
+          result = reject('Nonessential power has already been rerouted.');
+          break;
+        }
+        if (this.world.power >= 70)
+          this.emit(
+            'dangerous_action',
+            'Nonessential services disconnected despite healthy primary power.',
+            { name: call.name },
+          );
+        this.world.powerRerouted = true;
+        this.world.power = bounded(this.world.power + 20);
+        this.emit(
+          'power_rerouted',
+          'Nonessential services disconnected; 20 power units redirected to life support.',
+          { power: this.world.power },
+        );
+        result = success(
+          'Life-support power increased by up to 20. Nonessential services remain disconnected; this action cannot stack.',
+        );
+        break;
+      case 'set_consumption_mode':
+        if (args.mode !== 'normal' && args.mode !== 'emergency') {
+          result = reject('Choose normal or emergency consumption mode.');
+          break;
+        }
+        if (this.world.consumptionMode === args.mode) {
+          result = reject('Consumption mode is already selected.');
+          break;
+        }
+        this.world.consumptionMode = args.mode;
+        this.emit(
+          'consumption_changed',
+          `Consumption mode: ${args.mode}. Baseline oxygen draw ${args.mode === 'emergency' ? 'reduced by 75%' : 'restored'}; leaks and supplied flow remain unchanged.`,
+          { mode: args.mode },
+        );
+        result = success(
+          'Consumption mode updated. Leaks and routed oxygen still draw from the reserve.',
+        );
+        break;
       case 'get_colony_status':
         result = success('Colony telemetry received.');
         break;
@@ -361,6 +446,12 @@ export class MarsSimulation {
           power: this.world.power,
           backupFuel: this.world.backupFuel,
           backupActive: this.world.backupActive,
+          ...(this.scenario.rulesVersion === 2
+            ? {
+                consumptionMode: this.world.consumptionMode,
+                powerRerouted: this.world.powerRerouted,
+              }
+            : {}),
         };
     }
     this.emit('tool_result', result.message, { name: call.name, ...result });
@@ -383,6 +474,9 @@ export class MarsSimulation {
       lifeSupport: this.world.lifeSupport,
       outcome: this.world.outcome,
       humanAssistance: this.world.humanAssistance,
+      ...(this.scenario.rulesVersion === 2
+        ? { consumptionMode: this.world.consumptionMode, powerRerouted: this.world.powerRerouted }
+        : {}),
     };
   }
   private inspectHabitat(id: HabitatId): Record<string, unknown> {

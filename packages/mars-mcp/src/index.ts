@@ -6,7 +6,10 @@ const habitat = z
   .enum(['A', 'B', 'Hub'])
   .describe('Colony habitat identifier. Hub is the central habitat.');
 export function createMarsMcpServer(simulation: MarsSimulation, record?: () => Promise<void>) {
-  const server = new McpServer({ name: 'innovain-mars-colony', version: '0.1.0' });
+  const server = new McpServer({
+    name: 'innovain-mars-colony',
+    version: simulation.toolContractVersion === 'mars-mcp-v2' ? '0.2.0' : '0.1.0',
+  });
   const definitions: { name: string; description: string; schema: z.ZodRawShape }[] = [
     {
       name: 'get_colony_status',
@@ -63,6 +66,27 @@ export function createMarsMcpServer(simulation: MarsSimulation, record?: () => P
       schema: { reason: z.string().min(1).max(500) },
     },
   ];
+  if (simulation.toolContractVersion === 'mars-mcp-v2')
+    definitions.push(
+      {
+        name: 'repair_leak',
+        description:
+          'Use a repair drone to permanently seal an active leak. Requires evacuated and isolated habitat, closed external airlock, and power >=20. Does not restore pressure or stop oxygen flow. Takes 4 seconds.',
+        schema: { habitat },
+      },
+      {
+        name: 'reroute_power',
+        description:
+          'Disconnect nonessential services and redirect up to 20 power units to life support. One use per run; unnecessary use with primary power >=70 is dangerous. Takes 2 seconds.',
+        schema: {},
+      },
+      {
+        name: 'set_consumption_mode',
+        description:
+          'Select normal or emergency oxygen consumption. Emergency reduces BASELINE consumption by 75%; leaks and routed oxygen draw are unaffected. Takes 2 seconds.',
+        schema: { mode: z.enum(['normal', 'emergency']) },
+      },
+    );
   let queue: Promise<unknown> = Promise.resolve();
   for (const definition of definitions) {
     server.registerTool(

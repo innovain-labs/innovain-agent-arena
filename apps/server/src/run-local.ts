@@ -1,5 +1,7 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, writeFile, unlink, rmdir } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import type { ArenaEvent, Frame, Run, WorldState } from '@arena/arena-core';
 import {
   BudgetLimitError,
@@ -14,7 +16,8 @@ import { safeChildEnvironment } from './host-environment';
 import { calculateScore } from '@arena/scoring';
 import { validateRun } from '@arena/replay';
 
-type ProviderName = 'scripted' | 'openai' | 'ollama' | 'openai-compatible';
+type ProviderName =
+  'scripted' | 'openai' | 'ollama' | 'openai-compatible' | 'anthropic' | 'deepseek' | 'foundry';
 type AuthMode = 'bearer' | 'api-key';
 type ToolDefinition = { name: string; description?: string; inputSchema?: unknown };
 type ProviderMessage = {
@@ -77,26 +80,62 @@ export function parseLocalRunArgs(argv: string[]): LocalRunOptions {
   for (let index = 0; index < argv.length; index += 1) {
     const token = argv[index]!;
     if (token === '--') continue;
-    if (!token.startsWith('--')) continue;
+    if (!token.startsWith('--')) throw new Error(`Unexpected argument: ${token}`);
     const name = token.slice(2);
+    if (
+      ![
+        'provider',
+        'model',
+        'base-url',
+        'api-key-env',
+        'auth-mode',
+        'scenario',
+        'seed',
+        'output',
+        'budget-usd',
+        'max-input-tokens',
+        'max-output-tokens',
+        'max-tool-calls',
+        'request-timeout-ms',
+        'input-price-usd-per-million',
+        'output-price-usd-per-million',
+      ].includes(name)
+    )
+      throw new Error(`Unknown option --${name}. Run arena --help.`);
     const value = argv[index + 1];
     if (!value || value.startsWith('--')) throw new Error(`--${name} requires a value.`);
     values.set(name, value);
     index += 1;
   }
   const provider = (values.get('provider') ?? 'scripted') as ProviderName;
-  if (!['scripted', 'openai', 'ollama', 'openai-compatible'].includes(provider))
-    throw new Error('Provider must be scripted, openai, ollama, or openai-compatible.');
+  if (
+    ![
+      'scripted',
+      'openai',
+      'ollama',
+      'openai-compatible',
+      'anthropic',
+      'deepseek',
+      'foundry',
+    ].includes(provider)
+  )
+    throw new Error(
+      'Provider must be scripted, openai, ollama, openai-compatible, anthropic, deepseek, or foundry.',
+    );
   const baseUrl = values.get('base-url') ?? process.env.OPENAI_COMPATIBLE_BASE_URL;
-  if (provider === 'openai-compatible' && !baseUrl)
+  if ((provider === 'openai-compatible' || provider === 'foundry') && !baseUrl)
     throw new Error(
       'The openai-compatible provider requires --base-url or OPENAI_COMPATIBLE_BASE_URL.',
     );
-  const authMode = (values.get('auth-mode') ?? 'bearer') as AuthMode;
+  if (baseUrl) validateProviderUrl(baseUrl);
+  const authMode = (values.get('auth-mode') ??
+    (provider === 'foundry' ? 'api-key' : 'bearer')) as AuthMode;
   if (!['bearer', 'api-key'].includes(authMode))
     throw new Error('Auth mode must be bearer or api-key.');
   const model =
     values.get('model') ?? (provider === 'scripted' ? 'scripted-rescue' : 'gpt-4o-mini');
+  if (provider !== 'scripted' && !values.get('model'))
+    throw new Error('--model is required: use a model or deployment available in your account.');
   const requestTimeoutMs = Math.trunc(parseNumber(values, 'request-timeout-ms', 30_000));
   if (requestTimeoutMs < 1) throw new Error('--request-timeout-ms must be positive.');
   return {
@@ -106,7 +145,15 @@ export function parseLocalRunArgs(argv: string[]): LocalRunOptions {
     apiKeyEnv:
       values.get('api-key-env') ??
       process.env.OPENAI_COMPATIBLE_API_KEY_ENV ??
-      (provider === 'openai' ? 'OPENAI_API_KEY' : 'OPENAI_COMPATIBLE_API_KEY'),
+      (
+        {
+          openai: 'OPENAI_API_KEY',
+          anthropic: 'ANTHROPIC_API_KEY',
+          deepseek: 'DEEPSEEK_API_KEY',
+          foundry: 'AZURE_OPENAI_API_KEY',
+        } as Record<string, string>
+      )[provider] ??
+      'OPENAI_COMPATIBLE_API_KEY',
     authMode,
     scenarioPath: values.get('scenario'),
     seed: Math.trunc(parseNumber(values, 'seed', 183)),
@@ -123,7 +170,7 @@ export function parseLocalRunArgs(argv: string[]): LocalRunOptions {
     ),
     maxInputTokens: Math.trunc(parseNumber(values, 'max-input-tokens', 20_000)),
     maxOutputTokens: Math.trunc(parseNumber(values, 'max-output-tokens', 2_000)),
-    maxToolCalls: Math.trunc(parseNumber(values, 'max-tool-calls', 30)),
+    maxToolCalls: Math.trunc(parseNumber(values, 'max-tool-calls', 60)),
     requestTimeoutMs,
     inputPriceUsdPerMillion: values.has('input-price-usd-per-million')
       ? parseNumber(values, 'input-price-usd-per-million', 0)
@@ -132,6 +179,18 @@ export function parseLocalRunArgs(argv: string[]): LocalRunOptions {
       ? parseNumber(values, 'output-price-usd-per-million', 0)
       : undefined,
   };
+}
+
+export function validateProviderUrl(value: string) {
+  const url = new URL(value);
+  if (url.username || url.password || url.search || url.hash)
+    throw new Error('Provider URL must not contain credentials, query parameters, or fragments.');
+  if (
+    url.protocol !== 'https:' &&
+    !(url.protocol === 'http:' && ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname))
+  )
+    throw new Error('Remote providers require HTTPS; HTTP is allowed only on loopback.');
+  return url;
 }
 
 export function pricingFor(options: LocalRunOptions): PricingSnapshot | undefined {
@@ -179,39 +238,144 @@ async function callChatProvider(
   maxOutputTokens = options.maxOutputTokens,
 ): Promise<ProviderResponse> {
   const baseUrl =
-    options.provider === 'ollama'
+    options.baseUrl ??
+    (options.provider === 'ollama'
       ? 'http://127.0.0.1:11434/v1'
-      : options.provider === 'openai-compatible'
-        ? options.baseUrl
-        : 'https://api.openai.com/v1';
+      : options.provider === 'anthropic'
+        ? 'https://api.anthropic.com/v1'
+        : options.provider === 'deepseek'
+          ? 'https://api.deepseek.com/v1'
+          : 'https://api.openai.com/v1');
   if (!baseUrl) throw new Error('An OpenAI-compatible base URL is required.');
+  validateProviderUrl(baseUrl);
   const normalizedBaseUrl = baseUrl.replace(/\/+$/, '');
   const url = normalizedBaseUrl.endsWith('/chat/completions')
     ? normalizedBaseUrl
-    : `${normalizedBaseUrl}/chat/completions`;
+    : `${normalizedBaseUrl}/${options.provider === 'anthropic' ? 'messages' : 'chat/completions'}`;
   const headers: Record<string, string> = { 'content-type': 'application/json' };
   if (apiKey) {
-    if (options.provider === 'openai-compatible' && options.authMode === 'api-key')
-      headers['api-key'] = apiKey;
+    if (options.provider === 'anthropic') headers['x-api-key'] = apiKey;
+    else if (options.authMode === 'api-key') headers['api-key'] = apiKey;
     else headers.authorization = `Bearer ${apiKey}`;
+  }
+  if (options.provider === 'anthropic') headers['anthropic-version'] = '2023-06-01';
+  const anthropicMessages: Array<{ role: string; content: unknown[] }> = [];
+  for (const message of messages.filter((item) => item.role !== 'system')) {
+    const role = message.role === 'assistant' ? 'assistant' : 'user';
+    const content: unknown[] =
+      message.role === 'tool'
+        ? [
+            {
+              type: 'tool_result',
+              tool_use_id: message.tool_call_id,
+              content: message.content ?? '',
+            },
+          ]
+        : [
+            ...(message.content ? [{ type: 'text', text: message.content }] : []),
+            ...(message.tool_calls ?? []).map((call) => ({
+              type: 'tool_use',
+              id: call.id,
+              name: call.function.name,
+              input: JSON.parse(call.function.arguments),
+            })),
+          ];
+    const last = anthropicMessages.at(-1);
+    if (last?.role === role) last.content.push(...content);
+    else anthropicMessages.push({ role, content });
   }
   const response = await fetch(url, {
     method: 'POST',
     headers,
-    body: JSON.stringify({
-      model: options.model,
-      messages,
-      tools: toolSchemas(tools),
-      temperature: 0,
-      max_tokens: maxOutputTokens,
-    }),
+    redirect: 'error',
+    body: JSON.stringify(
+      options.provider === 'anthropic'
+        ? {
+            model: options.model,
+            system: messages
+              .filter((message) => message.role === 'system')
+              .map((message) => message.content)
+              .join('\n'),
+            messages: anthropicMessages,
+            tools: tools.map((tool) => ({
+              name: tool.name,
+              description: tool.description,
+              input_schema: tool.inputSchema,
+            })),
+            max_tokens: maxOutputTokens,
+          }
+        : {
+            model: options.model,
+            messages,
+            tools: toolSchemas(tools),
+            ...(options.provider === 'deepseek' ? { thinking: { type: 'disabled' } } : {}),
+            ...(options.provider === 'openai'
+              ? { max_completion_tokens: maxOutputTokens }
+              : { max_tokens: maxOutputTokens }),
+          },
+    ),
     signal: AbortSignal.timeout(options.requestTimeoutMs),
   });
-  const raw = await response.text();
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  const reader = response.body?.getReader();
+  if (reader)
+    try {
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        size += value.length;
+        if (size > 2_000_000) {
+          await reader.cancel();
+          throw new Error('Provider response exceeds 2 MB.');
+        }
+        chunks.push(value);
+      }
+    } finally {
+      reader.releaseLock();
+    }
+  const raw = Buffer.concat(chunks).toString('utf8');
   if (!response.ok)
     throw new Error(
       `Provider request failed (${response.status}): ${redactSecrets(raw, apiKey ? [apiKey] : [])}`,
     );
+  if (options.provider === 'anthropic') {
+    const result = JSON.parse(raw) as {
+      content: Array<{ type: string; text?: string; id?: string; name?: string; input?: unknown }>;
+      usage: {
+        input_tokens: number;
+        output_tokens: number;
+        cache_creation_input_tokens?: number;
+        cache_read_input_tokens?: number;
+      };
+    };
+    return {
+      choices: [
+        {
+          message: {
+            content: result.content
+              .filter((block) => block.type === 'text')
+              .map((block) => block.text)
+              .join('\n'),
+            tool_calls: result.content
+              .filter((block) => block.type === 'tool_use')
+              .map((block) => ({
+                id: block.id!,
+                type: 'function',
+                function: { name: block.name!, arguments: JSON.stringify(block.input) },
+              })),
+          },
+        },
+      ],
+      usage: {
+        prompt_tokens:
+          result.usage.input_tokens +
+          (result.usage.cache_creation_input_tokens ?? 0) +
+          (result.usage.cache_read_input_tokens ?? 0),
+        completion_tokens: result.usage.output_tokens,
+      },
+    };
+  }
   return JSON.parse(raw) as ProviderResponse;
 }
 
@@ -304,13 +468,12 @@ export function nextProviderCall(
 
 async function runLocal(options: LocalRunOptions): Promise<Run> {
   const scenarioPath = resolve(
-    options.scenarioPath ?? 'scenarios/mars/habitat-b-leak/scenario.yaml',
+    options.scenarioPath ?? 'scenarios/mars/habitat-b-leak-v2/scenario.yaml',
   );
   const scenario = await loadScenario(scenarioPath);
   const briefing = await readFile(resolve(dirname(scenarioPath), 'briefing.md'), 'utf8');
   const outputPath = resolve(options.outputPath);
-  const workDirectory = resolve('work', `local-${Date.now()}`);
-  await mkdir(workDirectory, { recursive: true });
+  const workDirectory = await mkdtemp(resolve(tmpdir(), 'innovain-arena-'));
   const recordPath = resolve(workDirectory, 'mcp-record.json');
   const pricing = pricingFor(options);
   const policy = createBudgetPolicy({
@@ -324,13 +487,16 @@ async function runLocal(options: LocalRunOptions): Promise<Run> {
     maxRetries: 0,
   });
   let stopReason: string | undefined;
+  let fatalError: unknown;
   const usage = { inputTokens: 0, outputTokens: 0, totalTokens: 0 };
   let toolCalls = 0;
   const session = new AgentSession();
   try {
     const listed = await session.connect(
       process.execPath,
-      ['--import', 'tsx', 'apps/server/src/mcp.ts'],
+      fileURLToPath(import.meta.url).endsWith('.mjs')
+        ? [fileURLToPath(new URL('./mcp.mjs', import.meta.url))]
+        : ['--import', 'tsx', 'apps/server/src/mcp.ts'],
       resolve('.'),
       {
         ...safeChildEnvironment([options.apiKeyEnv]),
@@ -338,7 +504,8 @@ async function runLocal(options: LocalRunOptions): Promise<Run> {
         ARENA_RECORD_PATH: recordPath,
       },
     );
-    if (listed.tools.length !== 9) throw new Error('Expected all nine Mars MCP tools.');
+    if (listed.tools.length !== (scenario.rulesVersion === 2 ? 12 : 9))
+      throw new Error('Unexpected Mars MCP tool contract.');
     const tools = listed.tools as ToolDefinition[];
     if (options.provider === 'scripted') {
       const plan = scriptedPlanFor(
@@ -357,8 +524,7 @@ async function runLocal(options: LocalRunOptions): Promise<Run> {
         toolCalls += 1;
       }
     } else {
-      const requiresApiKey =
-        options.provider === 'openai' || options.provider === 'openai-compatible';
+      const requiresApiKey = options.provider !== 'ollama';
       const apiKey = requiresApiKey ? process.env[options.apiKeyEnv] : undefined;
       if (requiresApiKey && !apiKey)
         throw new Error(
@@ -372,6 +538,7 @@ async function runLocal(options: LocalRunOptions): Promise<Run> {
         },
         { role: 'user', content: briefing },
       ];
+      let missionFinished = false;
       for (;;) {
         if (toolCalls >= policy.maxToolCallsPerRun)
           throw new BudgetLimitError({
@@ -420,6 +587,8 @@ async function runLocal(options: LocalRunOptions): Promise<Run> {
           tool_calls: message.tool_calls,
         });
         for (const call of message.tool_calls) {
+          if (apiKey && JSON.stringify(call).includes(apiKey))
+            throw new Error('Provider echoed a credential; refusing to send it to MCP.');
           if (toolCalls >= options.maxToolCalls)
             throw new BudgetLimitError({
               allowed: false,
@@ -442,12 +611,20 @@ async function runLocal(options: LocalRunOptions): Promise<Run> {
             name: call.function.name,
             content: JSON.stringify(result),
           });
+          if (result.observation?.outcome && result.observation.outcome !== 'running') {
+            missionFinished = true;
+            break;
+          }
         }
+        if (missionFinished) break;
       }
     }
   } catch (error) {
     if (error instanceof BudgetLimitError) stopReason = error.message;
-    else throw error;
+    else {
+      stopReason = `PROVIDER OR MCP ERROR: ${redactSecrets(error instanceof Error ? error.message : String(error), [process.env[options.apiKeyEnv] ?? ''])}`;
+      fatalError = error;
+    }
   } finally {
     await session.close();
   }
@@ -456,6 +633,8 @@ async function runLocal(options: LocalRunOptions): Promise<Run> {
     frames: Frame[];
     state: WorldState;
   };
+  await unlink(recordPath);
+  await rmdir(workDirectory);
   const actualUsd = pricing ? estimateCost(usage, pricing) : undefined;
   const cost =
     options.provider === 'scripted'
@@ -476,7 +655,8 @@ async function runLocal(options: LocalRunOptions): Promise<Run> {
       id: `local-${options.provider}-${options.model}-${options.seed}`,
       scenarioId: scenario.metadata.id,
       scenarioName: scenario.metadata.name,
-      scenarioVersion: scenario.schemaVersion,
+      scenarioVersion: scenario.rulesVersion ?? 1,
+      toolContractVersion: scenario.rulesVersion === 2 ? 'mars-mcp-v2' : 'mars-mcp-v1',
       agent: `${options.provider}/${options.model}`,
       seed: options.seed,
       recordedAt: new Date().toISOString(),
@@ -509,8 +689,17 @@ async function runLocal(options: LocalRunOptions): Promise<Run> {
     ),
   };
   validateRun(run);
+  const secret = process.env[options.apiKeyEnv];
+  if (secret && JSON.stringify(run).includes(secret))
+    throw new Error('Credential detected in recording; refusing export.');
   await mkdir(dirname(outputPath), { recursive: true });
   await writeFile(outputPath, JSON.stringify(run, null, 2) + '\n');
+  if (fatalError)
+    throw new Error(
+      redactSecrets(fatalError instanceof Error ? fatalError.message : String(fatalError), [
+        process.env[options.apiKeyEnv] ?? '',
+      ]),
+    );
   return run;
 }
 

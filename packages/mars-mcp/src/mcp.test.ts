@@ -42,3 +42,30 @@ describe('real MCP protocol boundary', () => {
     }
   });
 });
+
+test('v2 discovers twelve tools and validates interventions at the MCP boundary', async () => {
+  const simulation = new MarsSimulation(
+    parseScenario(parse(readFileSync('scenarios/mars/power-blackout-v2/scenario.yaml', 'utf8'))),
+  );
+  const server = createMarsMcpServer(simulation);
+  const client = new Client({ name: 'v2-integration', version: '1.0.0' });
+  const [a, b] = InMemoryTransport.createLinkedPair();
+  await server.connect(b);
+  await client.connect(a);
+  try {
+    expect((await client.listTools()).tools).toHaveLength(12);
+    expect(
+      (await client.callTool({ name: 'set_consumption_mode', arguments: { mode: 'invalid' } }))
+        .isError,
+    ).toBe(true);
+    expect(simulation.state.time).toBe(0);
+    expect((await client.callTool({ name: 'reroute_power', arguments: {} })).isError).toBe(false);
+    expect(simulation.state.power).toBe(22);
+    const status = await client.callTool({ name: 'inspect_life_support', arguments: {} });
+    expect(JSON.stringify(status)).toContain('powerRerouted');
+    expect(JSON.stringify(status)).not.toContain('requirePowerReroute');
+  } finally {
+    await client.close();
+    await server.close();
+  }
+});

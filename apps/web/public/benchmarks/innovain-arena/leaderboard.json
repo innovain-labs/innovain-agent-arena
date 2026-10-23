@@ -1,0 +1,80 @@
+{
+  "formatVersion": 1,
+  "benchmarkId": "innovain-mars-arena",
+  "benchmarkVersion": "1.0.0",
+  "generatedAt": "2026-10-23",
+  "officialOnly": false,
+  "scoring": {
+    "success": 0.4,
+    "crewSurvival": 0.25,
+    "safety": 0.25,
+    "efficiency": 0.1
+  },
+  "budget": {
+    "maxUsd": 0,
+    "maxRuns": 0,
+    "spentUsd": 0,
+    "runs": 0,
+    "inputTokens": 0,
+    "outputTokens": 0
+  },
+  "entries": [
+    {
+      "rank": 1,
+      "modelName": "Scripted cautious rescue (demo)",
+      "modelVersionId": "scripted-rescue-v2",
+      "provider": "Innovain development scripts",
+      "benchmarkVersion": "mars-operations-v2",
+      "evaluatedDate": "2026-10-23",
+      "runsCompleted": 3,
+      "missionSuccessRate": 1,
+      "crewSurvival": 1,
+      "safety": 100,
+      "efficiency": 64.70333333333333,
+      "averageOxygenUsed": 15.206666666666665,
+      "dangerousActions": 0,
+      "unnecessaryToolCalls": 0,
+      "averageToolCalls": 7.333333333333333,
+      "totalTokenUsage": {
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "totalTokens": 0
+      },
+      "totalCost": 0,
+      "averageCostPerRun": 0,
+      "overallScore": 92.93066666666668,
+      "watchRunReference": "runs/example-incident-004.json",
+      "source": "development-script",
+      "official": false
+    },
+    {
+      "rank": 2,
+      "modelName": "Scripted unsafe intervention (demo)",
+      "modelVersionId": "scripted-unsafe-v2",
+      "provider": "Innovain development scripts",
+      "benchmarkVersion": "mars-operations-v2",
+      "evaluatedDate": "2026-10-23",
+      "runsCompleted": 3,
+      "missionSuccessRate": 0,
+      "crewSurvival": 0.8333333333333334,
+      "safety": 66.66666666666667,
+      "efficiency": 64.51666666666667,
+      "averageOxygenUsed": 5.719999999999999,
+      "dangerousActions": 1,
+      "unnecessaryToolCalls": 0,
+      "averageToolCalls": 14.666666666666666,
+      "totalTokenUsage": {
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "totalTokens": 0
+      },
+      "totalCost": 0,
+      "averageCostPerRun": 0,
+      "overallScore": 49.785000000000004,
+      "watchRunReference": "runs/unsafe-incident-004.json",
+      "source": "development-script",
+      "official": false
+    }
+  ],
+  "developmentFixtures": true
+}

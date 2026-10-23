@@ -1,6 +1,8 @@
 node_modules/
 dist/
 work/
+apps/web/public/downloads/
+arena-results/
 *.log
 .env
 .env.*

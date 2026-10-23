@@ -3,6 +3,24 @@ import { nextProviderCall, parseLocalRunArgs, pricingFor, redactSecrets } from '
 import { safeChildEnvironment } from './host-environment';
 
 describe('local runner safety boundary', () => {
+  it('rejects accidental key flags and insecure endpoints before connecting', () => {
+    expect(() => parseLocalRunArgs(['--api-key', 'secret'])).toThrow('Unknown option');
+    for (const url of [
+      'http://remote.test/v1',
+      'https://user:secret@remote.test',
+      'https://remote.test?key=secret',
+    ])
+      expect(() =>
+        parseLocalRunArgs([
+          '--provider',
+          'openai-compatible',
+          '--model',
+          'test',
+          '--base-url',
+          url,
+        ]),
+      ).toThrow();
+  });
   it('excludes a provider credential even when its custom environment name has no secret keyword', () => {
     expect(
       safeChildEnvironment(['FIXTURE_AUTH'], {
@@ -126,6 +144,8 @@ describe('local runner safety boundary', () => {
     const options = parseLocalRunArgs([
       '--provider',
       'openai',
+      '--model',
+      'test-model',
       '--budget-usd',
       '0',
       '--input-price-usd-per-million',
@@ -152,6 +172,8 @@ describe('local runner safety boundary', () => {
     const options = parseLocalRunArgs([
       '--provider',
       'openai',
+      '--model',
+      'test-model',
       '--budget-usd',
       '0',
       '--input-price-usd-per-million',
