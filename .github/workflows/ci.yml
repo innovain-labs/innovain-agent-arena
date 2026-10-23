@@ -22,5 +22,7 @@ jobs:
       - run: pnpm check
       - run: pnpm community:build
       - run: git diff --exit-code -- apps/web/public/community
+      - run: pnpm innovain:leaderboard
+      - run: git diff --exit-code -- benchmarks/innovain-arena apps/web/public/benchmarks/innovain-arena
       - run: pnpm runs:verify
       - run: git diff --exit-code -- runs apps/web/public/runs

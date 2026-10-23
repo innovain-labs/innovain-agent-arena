@@ -8,8 +8,14 @@ import { validateRun } from '@arena/replay';
 import { calculateScore } from '@arena/scoring';
 
 /** Recompute consequences against a trusted host scenario; model provenance remains self-reported. */
-export async function verifyCommunityRun(value: unknown, canonical: MarsScenario): Promise<Run> {
+export async function verifyCommunityRun(
+  value: unknown,
+  canonical: MarsScenario,
+  options: { allowAgentStopped?: boolean } = {},
+): Promise<Run> {
   const run = validateRun(value);
+  const agentStopped =
+    run.metadata.model?.configuration?.stopReason === 'MODEL_STOPPED_BEFORE_TERMINAL_OUTCOME';
   if (run.events.length > 20_000 || run.frames.length > 10_000)
     throw new Error('Community journal limit exceeded.');
   if (
@@ -37,6 +43,11 @@ export async function verifyCommunityRun(value: unknown, canonical: MarsScenario
         name: String(call.data.name),
         arguments: call.data.arguments as Record<string, unknown>,
       });
+    if (agentStopped) {
+      if (!options.allowAgentStopped)
+        throw new Error('Community runs cannot add the official model-stopped terminal marker.');
+      world.markAgentStopped();
+    }
   } finally {
     await client.close();
     await server.close();

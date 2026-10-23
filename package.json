@@ -21,6 +21,8 @@
     "benchmark:run": "tsx apps/server/src/run-benchmark.ts",
     "benchmark:estimate": "tsx apps/server/src/estimate-benchmark.ts",
     "benchmark:leaderboard": "tsx apps/server/src/generate-leaderboard.ts",
+    "innovain:evaluate": "tsx apps/server/src/run-innovain-evaluation.ts",
+    "innovain:leaderboard": "tsx apps/server/src/innovain-leaderboard.ts",
     "arena:run": "tsx apps/server/src/run-local.ts",
     "runs:verify": "tsx apps/server/src/verify-runs.ts",
     "mcp": "tsx apps/server/src/mcp.ts",

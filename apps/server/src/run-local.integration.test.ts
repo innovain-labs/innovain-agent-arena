@@ -3,6 +3,8 @@ import { mkdir, mkdtemp, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { afterEach, describe, expect, test } from 'vitest';
 import { executeLocalRun, parseLocalRunArgs } from './run-local';
+import { loadScenario } from './scenario-loader';
+import { verifyCommunityRun } from './community';
 
 let server: Server | undefined;
 afterEach(async () => {
@@ -21,6 +23,114 @@ async function outputPath() {
 }
 
 describe('local runner against real MCP and a local provider fixture', () => {
+  test('records a model that stops before a terminal outcome as a replayable loss', async () => {
+    server = createServer((_request, response) => {
+      response.setHeader('content-type', 'application/json');
+      response.end(
+        JSON.stringify({
+          model: 'fixture-model',
+          choices: [{ message: { content: 'The mission appears stable.' } }],
+          usage: { prompt_tokens: 20, completion_tokens: 8, total_tokens: 28 },
+        }),
+      );
+    });
+    await new Promise<void>((done) => server!.listen(0, '127.0.0.1', done));
+    const address = server.address();
+    if (!address || typeof address === 'string') throw new Error('Fixture failed.');
+    process.env.ARENA_TEST_API_KEY = 'early-stop-fixture-key';
+    const output = await outputPath();
+    const scenarioPath = 'scenarios/mars/habitat-b-leak-v2/scenario.yaml';
+    const run = await executeLocalRun(
+      parseLocalRunArgs([
+        '--provider',
+        'openai-compatible',
+        '--model',
+        'fixture-model',
+        '--base-url',
+        `http://127.0.0.1:${address.port}/v1`,
+        '--api-key-env',
+        'ARENA_TEST_API_KEY',
+        '--scenario',
+        scenarioPath,
+        '--output',
+        output,
+      ]),
+    );
+    expect(run.finalOutcome).toBe('failure');
+    expect(run.metadata.model?.configuration?.stopReason).toBe(
+      'MODEL_STOPPED_BEFORE_TERMINAL_OUTCOME',
+    );
+    const canonical = await loadScenario(scenarioPath);
+    await expect(
+      verifyCommunityRun(run, canonical, { allowAgentStopped: true }),
+    ).resolves.toMatchObject({
+      finalOutcome: 'failure',
+    });
+    await expect(verifyCommunityRun(run, canonical)).rejects.toThrow('official model-stopped');
+    expect(await readFile(output, 'utf8')).not.toContain('early-stop-fixture-key');
+  });
+
+  test('uses Azure GPT-5.6 tool-calling parameters and keeps the deployment identity in the replay', async () => {
+    const bodies: Array<Record<string, unknown>> = [];
+    server = createServer(async (request, response) => {
+      let raw = '';
+      for await (const chunk of request) raw += String(chunk);
+      bodies.push(JSON.parse(raw) as Record<string, unknown>);
+      expect(request.url).toBe('/openai/v1/chat/completions');
+      expect(request.headers['api-key']).toBe('foundry-fixture-key');
+      response.setHeader('content-type', 'application/json');
+      response.end(
+        JSON.stringify({
+          model: 'gpt-5.6-luna',
+          choices: [
+            {
+              message:
+                bodies.length === 1
+                  ? {
+                      tool_calls: [
+                        {
+                          id: 'inspect-1',
+                          type: 'function',
+                          function: { name: 'inspect_life_support', arguments: '{}' },
+                        },
+                      ],
+                    }
+                  : { content: 'Inspection complete.' },
+            },
+          ],
+          usage: { prompt_tokens: 20, completion_tokens: 10, total_tokens: 30 },
+        }),
+      );
+    });
+    await new Promise<void>((done) => server!.listen(0, '127.0.0.1', done));
+    const address = server.address();
+    if (!address || typeof address === 'string') throw new Error('Fixture failed.');
+    process.env.ARENA_TEST_API_KEY = 'foundry-fixture-key';
+    const output = await outputPath();
+    const run = await executeLocalRun(
+      parseLocalRunArgs([
+        '--provider',
+        'foundry',
+        '--model',
+        'gpt-5.6-luna',
+        '--base-url',
+        `http://127.0.0.1:${address.port}/openai/v1`,
+        '--api-key-env',
+        'ARENA_TEST_API_KEY',
+        '--output',
+        output,
+      ]),
+    );
+    expect(bodies[0]).toMatchObject({
+      model: 'gpt-5.6-luna',
+      reasoning_effort: 'none',
+      max_completion_tokens: 2000,
+    });
+    expect(bodies[0]).not.toHaveProperty('max_tokens');
+    expect(run.metadata.model?.configuration?.providerReportedModel).toBe('gpt-5.6-luna');
+    expect(await readFile(output, 'utf8')).not.toContain('foundry-fixture-key');
+  });
+
   test('loads the selected briefing, authenticates locally, and imports an unpriced real MCP run', async () => {
     const requests: Array<{
       max_tokens: number;

@@ -11,6 +11,7 @@ import {
   type PricingSnapshot,
 } from '@arena/benchmarking';
 import { AgentSession, scriptedPlanFor } from '@arena/agent-runner';
+import { MarsSimulation } from '@arena/mars-world';
 import { loadScenario } from './scenario-loader';
 import { safeChildEnvironment } from './host-environment';
 import { calculateScore } from '@arena/scoring';
@@ -32,6 +33,7 @@ type ProviderMessage = {
   }>;
 };
 type ProviderResponse = {
+  model?: string;
   choices?: Array<{
     message?: { content?: string | null; tool_calls?: ProviderMessage['tool_calls'] };
   }>;
@@ -249,6 +251,7 @@ async function callChatProvider(
   if (!baseUrl) throw new Error('An OpenAI-compatible base URL is required.');
   validateProviderUrl(baseUrl);
   const normalizedBaseUrl = baseUrl.replace(/\/+$/, '');
+  const isGpt56 = /^gpt-5\.6(?:-|$)/i.test(options.model);
   const url = normalizedBaseUrl.endsWith('/chat/completions')
     ? normalizedBaseUrl
     : `${normalizedBaseUrl}/${options.provider === 'anthropic' ? 'messages' : 'chat/completions'}`;
@@ -309,7 +312,8 @@ async function callChatProvider(
             messages,
             tools: toolSchemas(tools),
             ...(options.provider === 'deepseek' ? { thinking: { type: 'disabled' } } : {}),
-            ...(options.provider === 'openai'
+            ...(isGpt56 ? { reasoning_effort: 'none' } : {}),
+            ...(options.provider === 'openai' || (options.provider === 'foundry' && isGpt56)
               ? { max_completion_tokens: maxOutputTokens }
               : { max_tokens: maxOutputTokens }),
           },
@@ -490,6 +494,8 @@ async function runLocal(options: LocalRunOptions): Promise<Run> {
   let fatalError: unknown;
   const usage = { inputTokens: 0, outputTokens: 0, totalTokens: 0 };
   let toolCalls = 0;
+  let providerReportedModel: string | undefined;
+  let agentStoppedEarly = false;
   const session = new AgentSession();
   try {
     const listed = await session.connect(
@@ -555,6 +561,7 @@ async function runLocal(options: LocalRunOptions): Promise<Run> {
           apiKey,
           limits.maxOutputTokens,
         );
+        if (response.model) providerReportedModel = response.model;
         const currentUsage = usageFromResponse(response);
         usage.inputTokens += currentUsage.inputTokens;
         usage.outputTokens += currentUsage.outputTokens;
@@ -580,7 +587,10 @@ async function runLocal(options: LocalRunOptions): Promise<Run> {
           });
         const message = response.choices?.[0]?.message;
         if (!message) throw new Error('Provider returned no assistant message.');
-        if (!message.tool_calls?.length) break;
+        if (!message.tool_calls?.length) {
+          if (!missionFinished) agentStoppedEarly = true;
+          break;
+        }
         messages.push({
           role: 'assistant',
           content: message.content ?? null,
@@ -628,11 +638,26 @@ async function runLocal(options: LocalRunOptions): Promise<Run> {
   } finally {
     await session.close();
   }
-  const recording = JSON.parse(await readFile(recordPath, 'utf8')) as {
+  let recording = JSON.parse(await readFile(recordPath, 'utf8')) as {
     events: ArenaEvent[];
     frames: Frame[];
     state: WorldState;
   };
+  if (agentStoppedEarly) {
+    const replay = new MarsSimulation(scenario);
+    for (const event of recording.events.filter((item) => item.type === 'tool_called'))
+      replay.execute({
+        name: String(event.data.name),
+        arguments: event.data.arguments as Record<string, unknown>,
+      });
+    replay.markAgentStopped();
+    recording = {
+      events: replay.journal.events,
+      frames: replay.journal.frames,
+      state: replay.state,
+    };
+    stopReason = 'MODEL_STOPPED_BEFORE_TERMINAL_OUTCOME';
+  }
   await unlink(recordPath);
   await rmdir(workDirectory);
   const actualUsd = pricing ? estimateCost(usage, pricing) : undefined;
@@ -669,6 +694,7 @@ async function runLocal(options: LocalRunOptions): Promise<Run> {
         version: 'local-v1',
         configuration: {
           runner: 'local-v1',
+          ...(providerReportedModel ? { providerReportedModel } : {}),
           ...(stopReason ? { stopReason } : {}),
           ...(options.provider === 'openai-compatible' ? { authMode: options.authMode } : {}),
         },

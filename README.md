@@ -10,10 +10,11 @@ The project includes **three playable Mars emergencies**: a habitat pressure lea
 
 **Seal the leak. Redirect power. Make the oxygen last.** The emergencies include a repair drone, power routing and emergency conservation. Every action has prerequisites, a simulation-time cost and recorded consequences. Open **Take the controls** in the Arena to play directly in the browser without an API key; manual practice never enters either leaderboard.
 
-The Innovain Top 10 is reserved for verified real-model evaluations. Recorded demonstrations are not model results. Community replays have a separate board. See the [tool catalog](docs/mcp-tools.md), [Community Top 10 contribution guide](docs/community-leaderboard.md) and [public arena architecture proposal](docs/public-arena-architecture.md).
+The Innovain Top 10 is reserved for controlled real-model evaluations. Recorded demonstrations are not model results, and Community replays have a separate board. See the [tool catalog](docs/mcp-tools.md), [Community Top 10 contribution guide](docs/community-leaderboard.md), [Azure evaluation instructions](docs/benchmarking/innovain-top-10.md) and [public arena architecture proposal](docs/public-arena-architecture.md).
 
 ```sh
 pnpm arena:run -- --provider scripted --model scripted-rescue --scenario scenarios/mars/habitat-b-leak-v2/scenario.yaml --output runs/my-repair.json
+pnpm innovain:leaderboard # Rebuild and replay-verify Innovain's real-model Top 10
 pnpm community:build     # Verify reviewed community suites and generate Top 10
 ```
 
@@ -84,7 +85,11 @@ The engine has no React or Three.js dependency. MCP responses exclude scenario m
 
 Agent Arena now supports file-based multi-attempt Experiments. Baseline attempts start without memory; adaptive attempts carry a versioned, human-readable Strategy Artifact produced from a public Reflection of the preceding run. Training and holdout seeds are separated so strategy updates cannot see holdout outcomes. See [adaptive agents](docs/research/adaptive-agents.md) and [experiments](docs/research/experiments.md).
 
-The Innovain Top 10 is currently empty while real-model evaluations are prepared. Scripted examples and manual browser sessions are excluded. Community submissions use a separate board and cannot change Innovain results.
+## First real-model evaluation
+
+The Innovain Top 10 now includes a controlled Azure Foundry evaluation of **GPT-5.6 Luna** (`gpt-5.6-luna-2026-07-09`). Six real runs cover all three v2 Mars emergencies, with two attempts per incident. The model completed three missions successfully and failed three; its overall score is **69.78/100**, with an estimated API cost of **US$0.027**. The [evaluation manifest and six replay files](benchmarks/innovain-arena/evaluations/gpt-5-6-luna-20261023T190511769z/evaluation.json) record the model response identity, endpoint type, token use, price snapshot, decisions and outcomes.
+
+Anyone can rebuild the Innovain Top 10 with `pnpm innovain:leaderboard`. This replays the saved actions against the canonical scenarios and recalculates each score without making another model call. **Watch Run** likewise plays the saved replay offline. The estimate uses Microsoft's published Global Standard token prices and is not an Azure invoice. Replay verification proves the actions and score reproduce; it cannot independently prove model identity. See the [evaluation protocol and limitations](docs/benchmarking/innovain-top-10.md). Community submissions remain separate and cannot change Innovain results.
 
 This is a fictional research simulator, not a physically calibrated life-support model or a validated model benchmark. Only verified real-model evaluations will appear on Innovain's leaderboard; local practice and community runs remain separate. See the [public site map](docs/public-site.md).
 
@@ -94,7 +99,7 @@ For general questions about Innovain Agent Arena, contact [info@innovain.com](ma
 
 Start with [creating scenarios](docs/creating-scenarios.md), [architecture](docs/architecture.md), and [CONTRIBUTING.md](CONTRIBUTING.md). Contributions to incident design, Mars visuals, scoring, research protocols, and controlled model evaluation are welcome. Coding agents should read [AGENTS.md](AGENTS.md). See the [roadmap](docs/roadmap.md), [release checklist](docs/release-checklist.md), [security policy](SECURITY.md), and [community conduct](CODE_OF_CONDUCT.md).
 
-The current leaderboard contains **scripted baselines, not measured LLM results**. Its versioned suite covers Incident 001 only; the two new emergency families do not silently alter historical benchmark comparability. The local runner supports real providers with a selected Mars scenario and its adjacent public briefing.
+The general `benchmark:run` command still uses scripted test doubles for inexpensive pipeline tests; it is separate from the real-model Innovain Top 10. The v2 emergency suite is versioned so its expanded tools and scenarios do not silently change the historical v1 benchmark.
 
 Apache-2.0. See [LICENSE](LICENSE) and [third-party notices](docs/assets.md). This repository is independent of Innovain.ContextOps.
 

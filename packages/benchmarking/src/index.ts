@@ -426,6 +426,7 @@ export interface LeaderboardEntry {
   totalTokenUsage: TokenUsage;
   totalCost: number;
   averageCostPerRun: number;
+  costStatus?: AggregateCost['status'];
   costPerSuccessfulMission?: number;
   overallScore: number;
   watchRunReference?: string;

@@ -1,0 +1,40 @@
+# Innovain Top 10: controlled Azure evaluations
+
+`innovain-mars-arena` evaluates a real Azure Foundry model against all three current Mars emergencies. It runs three attempts per emergency by default (nine paid runs), records the complete MCP action journals, usage and price snapshot, and generates the Innovain Top 10 artifact. The verified replay is deterministic; calling the model again can produce different actions.
+
+GPT-5.6 Luna uses Azure OpenAI's chat-completions endpoint with `reasoning_effort: none` so function tools are accepted. The runner keeps the deployment key in a local environment variable and never writes it to runs, manifests or logs. Model and version details follow Microsoft's [Foundry model catalog](https://learn.microsoft.com/en-us/azure/foundry/foundry-models/concepts/models-sold-directly-by-azure); the recorded rates link to Microsoft's [GPT-5.6 Luna pricing announcement](https://azure.microsoft.com/en-us/blog/gpt-5-6-now-available-in-microsoft-foundry/).
+
+```powershell
+$env:AZURE_OPENAI_API_KEY = '<key from the Azure resource>'
+pnpm innovain:evaluate -- `
+  --provider foundry `
+  --base-url https://RESOURCE.openai.azure.com/openai/v1 `
+  --model DEPLOYMENT_NAME `
+  --catalog-model gpt-5.6-luna `
+  --catalog-version 2026-07-09 `
+  --region eastus2 `
+  --deployment-type GlobalStandard `
+  --attempts 2 `
+  --seed 183 `
+  --suite-budget-usd 0.09 `
+  --max-input-tokens 60000 `
+  --max-output-tokens 2000 `
+  --max-tool-calls 30 `
+  --request-timeout-ms 60000 `
+  --request-timeout-ms 60000 `
+  --input-price-usd-per-million 0.20 `
+  --output-price-usd-per-million 1.20 `
+  --price-effective-date 2026-07-30 `
+  --price-source 'Microsoft Azure GPT-5.6 Luna Global Standard pricing'
+Remove-Item Env:AZURE_OPENAI_API_KEY
+```
+
+This example makes six runs (two per emergency) and caps the suite at about **$0.0864** using the listed rates, before any provider-side billing adjustments. The default is three attempts per emergency. The runner enforces a per-run budget based on the total suite cap and stops a mission when its token or dollar limit is reached. If the model returns a final answer while the simulation is still running, the official evaluator records that as a mission failure in the replay. Provider or budget interruptions remain partial and are excluded from the board. The evaluation manifest keeps the non-secret endpoint and API type; credentials never enter saved files.
+
+If a suite stops partway through, repeat it with `--resume --evaluation-id <same-id>`. The runner reuses completed, replay-verified attempts that match the scenario, seed and deployment, then retries missing or incomplete attempts. It refuses to overwrite a suite that already has its final manifest.
+
+The v2 incident worlds are deterministic and do not vary with the seed. Repeated attempts therefore measure variation in model decisions from the same initial incident state; they are not independent world variants. Each completed result stores the actual decisions and replay so the score can be reproduced without calling Azure again.
+
+`pnpm innovain:leaderboard` replays all saved official records against the canonical v2 scenarios, recalculates scores and costs, and writes both the source artifact and the static site copy. CI performs this rebuild and checks that the generated files are committed. The browser's **Watch Run** plays the saved replay and makes no provider request.
+
+An official entry comes from the trusted Innovain evaluation runner and its saved files. Replay verification proves the simulation actions and score reproduce; it cannot independently prove Azure model identity from a JSON file. The manifest records the deployment label and response-reported model when Azure supplies it. Community submissions remain self-reported and cannot enter this board.

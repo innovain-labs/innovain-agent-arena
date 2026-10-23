@@ -17,6 +17,7 @@ if (process.argv.includes('--clear')) {
     throw new Error('Refusing to replace existing real evaluations with development fixtures.');
   board.developmentFixtures = true;
   board.officialOnly = false;
+  board.benchmarkVersion = 'mars-operations-v2';
   board.entries = [];
   for (const unsafe of [false, true]) {
     const runs: Run[] = [];

@@ -114,6 +114,15 @@ export class MarsSimulation {
     }
   }
 
+  markAgentStopped() {
+    if (this.world.outcome !== 'running') return;
+    const reason = 'Agent stopped before the mission reached success or failure.';
+    this.world.outcome = 'failure';
+    this.world.outcomeReason = reason;
+    this.emit('mission_failed', reason, { reason: 'agent_stopped' });
+    this.journal.capture(this.world);
+  }
+
   private updateCrew() {
     for (const crew of this.world.crew) {
       if (crew.status === 'lost') continue;

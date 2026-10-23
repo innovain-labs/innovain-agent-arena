@@ -1,0 +1,73 @@
+{
+  "formatVersion": 1,
+  "benchmarkId": "innovain-mars-arena",
+  "benchmarkVersion": "mars-operations-v2",
+  "source": "official",
+  "official": true,
+  "verified": true,
+  "evaluatedAt": "2026-10-23T19:17:11.358Z",
+  "seed": 183,
+  "model": {
+    "provider": "Microsoft Foundry",
+    "model": "gpt-5.6-luna",
+    "version": "2026-07-09",
+    "deployment": "gpt-5.6-luna"
+  },
+  "connection": {
+    "endpoint": "https://icoderopenai.openai.azure.com/openai/v1",
+    "api": "azure-openai-v1",
+    "authentication": "api-key (secret not retained)"
+  },
+  "pricing": {
+    "id": "azure-foundry-gpt-5-6-luna-2026-07-30-globalstandard",
+    "effectiveDate": "2026-07-30",
+    "inputUsdPerMillionTokens": 0.2,
+    "outputUsdPerMillionTokens": 1.2,
+    "source": "Microsoft Azure GPT-5.6 Luna Global Standard pricing table, 2026-07-30 update"
+  },
+  "budget": {
+    "maxUsd": 0.09,
+    "maxInputTokens": 60000,
+    "maxOutputTokens": 2000,
+    "maxToolCalls": 30,
+    "attemptsPerIncident": 2
+  },
+  "runs": [
+    {
+      "scenarioSlug": "habitat-b-leak-v2",
+      "attempt": 1,
+      "seed": 183,
+      "reference": "runs/habitat-b-leak-v2-attempt-01.json"
+    },
+    {
+      "scenarioSlug": "habitat-b-leak-v2",
+      "attempt": 2,
+      "seed": 184,
+      "reference": "runs/habitat-b-leak-v2-attempt-02.json"
+    },
+    {
+      "scenarioSlug": "power-blackout-v2",
+      "attempt": 1,
+      "seed": 183,
+      "reference": "runs/power-blackout-v2-attempt-01.json"
+    },
+    {
+      "scenarioSlug": "power-blackout-v2",
+      "attempt": 2,
+      "seed": 184,
+      "reference": "runs/power-blackout-v2-attempt-02.json"
+    },
+    {
+      "scenarioSlug": "oxygen-shortage-v2",
+      "attempt": 1,
+      "seed": 183,
+      "reference": "runs/oxygen-shortage-v2-attempt-01.json"
+    },
+    {
+      "scenarioSlug": "oxygen-shortage-v2",
+      "attempt": 2,
+      "seed": 184,
+      "reference": "runs/oxygen-shortage-v2-attempt-02.json"
+    }
+  ]
+}
