@@ -34,6 +34,7 @@ type ProviderMessage = {
 };
 type ProviderResponse = {
   model?: string;
+  responseId?: string;
   choices?: Array<{
     message?: { content?: string | null; tool_calls?: ProviderMessage['tool_calls'] };
   }>;
@@ -46,6 +47,7 @@ export interface LocalRunOptions {
   baseUrl?: string;
   apiKeyEnv: string;
   authMode: AuthMode;
+  apiMode?: 'chat-completions' | 'responses';
   scenarioPath?: string;
   seed: number;
   outputPath: string;
@@ -92,6 +94,7 @@ export function parseLocalRunArgs(argv: string[]): LocalRunOptions {
         'base-url',
         'api-key-env',
         'auth-mode',
+        'api-mode',
         'scenario',
         'seed',
         'output',
@@ -126,6 +129,12 @@ export function parseLocalRunArgs(argv: string[]): LocalRunOptions {
     throw new Error(
       'Provider must be scripted, openai, ollama, openai-compatible, anthropic, deepseek, or foundry.',
     );
+  const apiMode = (values.get('api-mode') ?? 'chat-completions') as
+    'chat-completions' | 'responses';
+  if (!['chat-completions', 'responses'].includes(apiMode))
+    throw new Error('API mode must be chat-completions or responses.');
+  if (apiMode === 'responses' && provider !== 'foundry')
+    throw new Error('The Responses API mode is currently supported only for Microsoft Foundry.');
   const baseUrl = values.get('base-url') ?? process.env.OPENAI_COMPATIBLE_BASE_URL;
   if ((provider === 'openai-compatible' || provider === 'foundry') && !baseUrl)
     throw new Error(
@@ -160,6 +169,7 @@ export function parseLocalRunArgs(argv: string[]): LocalRunOptions {
       )[provider] ??
       'OPENAI_COMPATIBLE_API_KEY',
     authMode,
+    apiMode,
     scenarioPath: values.get('scenario'),
     seed: Math.trunc(parseNumber(values, 'seed', 183)),
     outputPath:
@@ -236,12 +246,31 @@ function toolSchemas(tools: ToolDefinition[]) {
   }));
 }
 
+function responseToolSchemas(tools: ToolDefinition[]) {
+  return tools.map((tool) => ({
+    type: 'function' as const,
+    name: tool.name,
+    description: tool.description ?? '',
+    parameters: tool.inputSchema ?? { type: 'object', properties: {} },
+    strict: false,
+  }));
+}
+
+type ResponseInputItem =
+  | { role: 'user'; content: string }
+  | { type: 'function_call_output'; call_id: string; output: string };
+type FoundryResponseOutput =
+  | { type: 'function_call'; call_id: string; name: string; arguments: string }
+  | { type: 'message'; content?: Array<{ type: string; text?: string }> };
+
 async function callChatProvider(
   options: LocalRunOptions,
   messages: ProviderMessage[],
   tools: ToolDefinition[],
   apiKey?: string,
   maxOutputTokens = options.maxOutputTokens,
+  previousResponseId?: string,
+  responseInput?: ResponseInputItem[],
 ): Promise<ProviderResponse> {
   const baseUrl =
     options.baseUrl ??
@@ -256,9 +285,15 @@ async function callChatProvider(
   validateProviderUrl(baseUrl);
   const normalizedBaseUrl = baseUrl.replace(/\/+$/, '');
   const isGpt56 = /^gpt-5\.6(?:-|$)/i.test(options.model);
-  const url = normalizedBaseUrl.endsWith('/chat/completions')
+  const responseApi = options.provider === 'foundry' && options.apiMode === 'responses';
+  const endpointSuffix = responseApi
+    ? 'responses'
+    : options.provider === 'anthropic'
+      ? 'messages'
+      : 'chat/completions';
+  const url = normalizedBaseUrl.endsWith(`/${endpointSuffix}`)
     ? normalizedBaseUrl
-    : `${normalizedBaseUrl}/${options.provider === 'anthropic' ? 'messages' : 'chat/completions'}`;
+    : `${normalizedBaseUrl}/${endpointSuffix}`;
   const headers: Record<string, string> = { 'content-type': 'application/json' };
   if (apiKey) {
     if (options.provider === 'anthropic') headers['x-api-key'] = apiKey;
@@ -296,31 +331,53 @@ async function callChatProvider(
     headers,
     redirect: 'error',
     body: JSON.stringify(
-      options.provider === 'anthropic'
+      responseApi
         ? {
             model: options.model,
-            system: messages
+            instructions: messages
               .filter((message) => message.role === 'system')
               .map((message) => message.content)
               .join('\n'),
-            messages: anthropicMessages,
-            tools: tools.map((tool) => ({
-              name: tool.name,
-              description: tool.description,
-              input_schema: tool.inputSchema,
-            })),
-            max_tokens: maxOutputTokens,
+            input:
+              responseInput ??
+              messages
+                .filter(
+                  (message): message is ProviderMessage & { role: 'user' } =>
+                    message.role === 'user',
+                )
+                .map((message) => ({ role: 'user', content: message.content ?? '' })),
+            tools: responseToolSchemas(tools),
+            tool_choice: 'auto',
+            reasoning: { effort: 'medium' },
+            max_output_tokens: maxOutputTokens,
+            store: true,
+            ...(previousResponseId ? { previous_response_id: previousResponseId } : {}),
           }
-        : {
-            model: options.model,
-            messages,
-            tools: toolSchemas(tools),
-            ...(options.provider === 'deepseek' ? { thinking: { type: 'disabled' } } : {}),
-            ...(isGpt56 ? { reasoning_effort: 'none' } : {}),
-            ...(options.provider === 'openai' || (options.provider === 'foundry' && isGpt56)
-              ? { max_completion_tokens: maxOutputTokens }
-              : { max_tokens: maxOutputTokens }),
-          },
+        : options.provider === 'anthropic'
+          ? {
+              model: options.model,
+              system: messages
+                .filter((message) => message.role === 'system')
+                .map((message) => message.content)
+                .join('\n'),
+              messages: anthropicMessages,
+              tools: tools.map((tool) => ({
+                name: tool.name,
+                description: tool.description,
+                input_schema: tool.inputSchema,
+              })),
+              max_tokens: maxOutputTokens,
+            }
+          : {
+              model: options.model,
+              messages,
+              tools: toolSchemas(tools),
+              ...(options.provider === 'deepseek' ? { thinking: { type: 'disabled' } } : {}),
+              ...(isGpt56 ? { reasoning_effort: 'none' } : {}),
+              ...(options.provider === 'openai' || (options.provider === 'foundry' && isGpt56)
+                ? { max_completion_tokens: maxOutputTokens }
+                : { max_tokens: maxOutputTokens }),
+            },
     ),
     signal: AbortSignal.timeout(options.requestTimeoutMs),
   });
@@ -381,6 +438,56 @@ async function callChatProvider(
           (result.usage.cache_creation_input_tokens ?? 0) +
           (result.usage.cache_read_input_tokens ?? 0),
         completion_tokens: result.usage.output_tokens,
+      },
+    };
+  }
+  if (responseApi) {
+    const result = JSON.parse(raw) as {
+      id?: string;
+      model?: string;
+      output?: FoundryResponseOutput[];
+      usage?: { input_tokens?: number; output_tokens?: number; total_tokens?: number };
+      status?: string;
+      incomplete_details?: { reason?: string } | null;
+      error?: { message?: string };
+    };
+    if (result.error?.message) throw new Error(`Responses API error: ${result.error.message}`);
+    if (result.status === 'incomplete')
+      throw new Error(
+        `Responses API response incomplete${result.incomplete_details?.reason ? ` (${result.incomplete_details.reason})` : ''}.`,
+      );
+    return {
+      responseId: result.id,
+      model: result.model,
+      choices: [
+        {
+          message: {
+            content: (result.output ?? [])
+              .filter(
+                (item): item is Extract<FoundryResponseOutput, { type: 'message' }> =>
+                  item.type === 'message',
+              )
+              .flatMap((item) => item.content ?? [])
+              .filter((part) => part.type === 'output_text' && typeof part.text === 'string')
+              .map((part) => part.text)
+              .join('\n'),
+            tool_calls: (result.output ?? [])
+              .filter(
+                (item): item is Extract<FoundryResponseOutput, { type: 'function_call' }> =>
+                  item.type === 'function_call',
+              )
+              .map((item) => ({
+                id: item.call_id,
+                type: 'function' as const,
+                function: { name: item.name, arguments: item.arguments },
+              })),
+          },
+        },
+      ],
+      usage: {
+        prompt_tokens: result.usage?.input_tokens,
+        completion_tokens: result.usage?.output_tokens,
+        total_tokens: result.usage?.total_tokens,
       },
     };
   }
@@ -557,6 +664,8 @@ async function runLocal(options: LocalRunOptions): Promise<Run> {
         { role: 'user', content: briefing },
       ];
       let missionFinished = false;
+      let previousResponseId: string | undefined;
+      let responseInput: ResponseInputItem[] | undefined;
       for (;;) {
         if (toolCalls >= policy.maxToolCallsPerRun)
           throw new BudgetLimitError({
@@ -573,7 +682,13 @@ async function runLocal(options: LocalRunOptions): Promise<Run> {
           tools,
           apiKey,
           limits.maxOutputTokens,
+          previousResponseId,
+          responseInput,
         );
+        if (options.apiMode === 'responses') {
+          previousResponseId = response.responseId;
+          responseInput = [];
+        }
         if (response.model) providerReportedModel = response.model;
         const currentUsage = usageFromResponse(response);
         usage.inputTokens += currentUsage.inputTokens;
@@ -628,6 +743,12 @@ async function runLocal(options: LocalRunOptions): Promise<Run> {
           }
           const result = await session.call({ name: call.function.name, arguments: args });
           toolCalls += 1;
+          if (options.apiMode === 'responses')
+            responseInput!.push({
+              type: 'function_call_output',
+              call_id: call.id,
+              output: JSON.stringify(result),
+            });
           messages.push({
             role: 'tool',
             tool_call_id: call.id,
@@ -663,13 +784,20 @@ async function runLocal(options: LocalRunOptions): Promise<Run> {
         name: String(event.data.name),
         arguments: event.data.arguments as Record<string, unknown>,
       });
-    replay.markAgentStopped();
+    if (replay.state.outcome === 'running') {
+      replay.markAgentStopped();
+      stopReason = 'MODEL_STOPPED_BEFORE_TERMINAL_OUTCOME';
+    } else {
+      // Some models inspect the colony once more after their final action.
+      // A terminal tool result means the mission finished even if that read
+      // only response did not explicitly repeat the terminal status.
+      stopReason = undefined;
+    }
     recording = {
       events: replay.journal.events,
       frames: replay.journal.frames,
       state: replay.state,
     };
-    stopReason = 'MODEL_STOPPED_BEFORE_TERMINAL_OUTCOME';
   }
   await unlink(recordPath);
   await rmdir(workDirectory);
@@ -707,6 +835,12 @@ async function runLocal(options: LocalRunOptions): Promise<Run> {
         version: 'local-v1',
         configuration: {
           runner: 'local-v1',
+          ...(options.provider === 'foundry'
+            ? {
+                api: options.apiMode,
+                ...(options.apiMode === 'responses' ? { reasoningEffort: 'medium' } : {}),
+              }
+            : {}),
           ...(providerReportedModel ? { providerReportedModel } : {}),
           ...(stopReason ? { stopReason } : {}),
           ...(options.provider === 'openai-compatible' ? { authMode: options.authMode } : {}),

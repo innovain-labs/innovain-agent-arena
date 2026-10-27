@@ -18,6 +18,7 @@ Commands:
 
 Providers: scripted, ollama, openai, anthropic, deepseek, foundry, openai-compatible
 Paid/local models require --model MODEL_OR_DEPLOYMENT.
+Microsoft Foundry: --api-mode chat-completions|responses (default chat-completions).
 Credentials: environment only; OPENAI_API_KEY, ANTHROPIC_API_KEY,
 DEEPSEEK_API_KEY, AZURE_OPENAI_API_KEY, or --api-key-env CUSTOM_VARIABLE.
 Endpoints: --base-url HTTPS_URL (required for foundry/openai-compatible).

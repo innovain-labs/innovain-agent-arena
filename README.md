@@ -6,6 +6,8 @@ An open-source experiment in agent behavior, told through a simulated survival w
 
 The project includes **three playable Mars emergencies**: a habitat pressure leak, a life-support blackout, and a critical oxygen shortage. Each has rescue and failure recordings generated through an actual MCP stdio client/server session. The browser replays recordings without any LLM calls.
 
+> **Project steward:** [Innovain](https://www.innovain.ai/), a Costa Rican startup, will continue improving Agent Arena. We welcome feature requests, bug reports, scenario ideas, research feedback, and community contributions. Contact us at [info@innovain.com](mailto:info@innovain.com).
+
 ## Mars Arena
 
 **Seal the leak. Redirect power. Make the oxygen last.** The emergencies include a repair drone, power routing and emergency conservation. Every action has prerequisites, a simulation-time cost and recorded consequences. Open **Take the controls** in the Arena to play directly in the browser without an API key; manual practice never enters either leaderboard.
@@ -18,7 +20,7 @@ pnpm innovain:leaderboard # Rebuild and replay-verify Innovain's real-model Top 
 pnpm community:build     # Verify reviewed community suites and generate Top 10
 ```
 
-For actual model decisions, configure a real provider locally using the [runner guide](docs/local-runner.md). The hosted service proposed in the architecture document is not implemented or deployed.
+For actual model decisions, configure a real provider locally using the [runner guide](docs/local-runner.md). The local runner supports OpenAI, Anthropic Claude, DeepSeek, Ollama, and OpenAI Chat Completions-compatible endpoints, including compatible Azure Foundry deployments. A Foundry Responses mode is available for supported deployments; Foundry project and hosted-agent APIs are not universally supported. Provider credentials stay on your machine. The hosted service proposed in the architecture document is not implemented or deployed.
 
 ## Run locally
 
@@ -49,7 +51,7 @@ pnpm arena:run -- --provider scripted --model scripted-rescue --scenario scenari
 pnpm audit              # Check production and development dependencies
 ```
 
-The public viewer requires no API key, account, database, or remote service. For local model experiments, `pnpm arena:run` supports deterministic scripted runs, Ollama, OpenAI, and any OpenAI-compatible endpoint such as Azure Foundry Models. Credentials stay on your machine; see [the local runner guide](docs/local-runner.md). All geometry and textures are procedural; no real infrastructure is connected.
+The public viewer requires no API key, account, database, or remote service. For local model experiments, `pnpm arena:run` supports deterministic scripted runs, Ollama, OpenAI, Anthropic Claude, DeepSeek, and OpenAI Chat Completions-compatible endpoints such as compatible Azure Foundry deployments. Credentials stay on your machine; see [the local runner guide](docs/local-runner.md) for supported APIs and limitations. All geometry and textures are procedural; no real infrastructure is connected.
 
 ## Architecture
 
@@ -58,7 +60,7 @@ apps/web             React + Vite viewer and procedural Three.js colony
 apps/server          Local MCP host, scenario loader, run generation
 packages/arena-core  State contracts, events, snapshots, numeric helpers
 packages/mars-world  Scenario validation and deterministic Mars rules
-packages/mars-mcp    Versioned nine/twelve-tool contracts using the official MCP TypeScript SDK
+packages/mars-mcp    Versioned MCP contracts: nine tools in v1 and twelve in v2
 packages/agent-runner Provider-independent MCP session and per-incident scripted fixtures
 packages/replay      Recording validation and deterministic snapshot seeking
 packages/scoring     Host-only deterministic evaluation
@@ -83,19 +85,34 @@ The engine has no React or Three.js dependency. MCP responses exclude scenario m
 
 ## Adaptive research layer
 
-Agent Arena now supports file-based multi-attempt Experiments. Baseline attempts start without memory; adaptive attempts carry a versioned, human-readable Strategy Artifact produced from a public Reflection of the preceding run. Training and holdout seeds are separated so strategy updates cannot see holdout outcomes. See [adaptive agents](docs/research/adaptive-agents.md) and [experiments](docs/research/experiments.md).
+Agent Arena supports file-based multi-attempt Experiments. Baseline attempts start without memory; adaptive attempts carry a versioned, human-readable Strategy Artifact produced from a public Reflection of the preceding run. Training and holdout seeds are separated so strategy updates cannot see holdout outcomes. The current experiment uses scripted test doubles to verify this pipeline; it is not evidence that a language model learns or improves. See [adaptive agents](docs/research/adaptive-agents.md) and [experiments](docs/research/experiments.md).
 
 ## Real-model evaluations
 
-The Innovain Top 10 currently includes controlled Microsoft Foundry evaluations of **DeepSeek V4 Pro** (86.33/100 across three emergencies; two missions succeeded; estimated API cost **US$0.169**), **Claude Haiku 5.5** (73.33/100; one mission succeeded; **US$0.017**), and **GPT-5.6 Luna** (69.78/100 across six attempts; three missions succeeded; **US$0.027**). These are suite scores, not the result of one mission. The [leaderboard artifact](benchmarks/innovain-arena/leaderboard.json) links each entry to its evaluation manifest and saved runs, including model response identity, token use, pricing snapshot, decisions and outcomes. Costs are estimates from recorded token use and published rates, not Azure invoices.
+As of **October 27, 2026**, the Innovain Top 10 contains eight controlled Microsoft Foundry evaluations of the current `mars-operations-v2` suite and shared `mars-mcp-v2` tool contract:
 
-Anyone can rebuild the Innovain Top 10 with `pnpm innovain:leaderboard`. This replays the saved actions against the canonical scenarios and recalculates each score without making another model call. **Watch Run** likewise plays the saved replay offline. The estimate uses Microsoft's published Global Standard token prices and is not an Azure invoice. Replay verification proves the actions and score reproduce; it cannot independently prove model identity. See the [evaluation protocol and limitations](docs/benchmarking/innovain-top-10.md). Community submissions remain separate and cannot change Innovain results.
+| Rank | Model and recorded version                         | Suite score | Successful mission runs | Estimated API cost |
+| ---: | -------------------------------------------------- | ----------: | ----------------------: | -----------------: |
+|    1 | GPT-6.1 Sol (`2026-09-29`)                         |  100.00/100 |                     3/3 |           US$0.114 |
+|    2 | Claude Sonnet 5.5 (Foundry model version `2`)      |   99.67/100 |                     3/3 |           US$0.220 |
+|    3 | DeepSeek V4 Pro (`2026-04-23`)                     |   86.33/100 |                     2/3 |           US$0.169 |
+|    4 | GPT-6 Luna (`2026-09-22`)                          |   86.00/100 |                     2/3 |           US$0.008 |
+|    5 | GLM-5.3 (Fireworks via Foundry, model version `2`) |   84.00/100 |                     2/3 |           US$0.809 |
+|    6 | Claude Haiku 5.5 (Foundry model version `2`)       |   73.33/100 |                     1/3 |           US$0.017 |
+|    7 | GPT-5.6 Luna (`2026-07-09`)                        |   69.78/100 |                    3/6* |           US$0.027 |
+|    8 | Kimi K2.7 Code (`2026-06-12`)                      |   67.22/100 |                     1/3 |           US$0.101 |
+
+The suite score is a weighted aggregate: mission success 40%, crew survival 25%, safety 25%, and efficiency 10%. Scores cover all completed attempts, not one mission. *GPT-5.6 Luna has two attempts per emergency; the other entries currently have one. Model versions and attempt counts can differ, so this is a reproducible comparison on the same incident and tool contract, not a claim of universal model superiority. Costs are estimates from each evaluation's recorded token usage and dated pricing snapshot; they are not Azure invoices and may differ from billed amounts.
+
+The [leaderboard artifact](benchmarks/innovain-arena/leaderboard.json) is the source of truth and links every entry to its evaluation manifest and saved runs, including provider-reported model identity, token usage, pricing snapshot, decisions, and outcomes. The local Innovain runner sends model tool calls to a local MCP stdio server; the model does not connect to a public MCP service. Provider identity is recorded but not independently attested.
+
+Anyone can rebuild the Innovain Top 10 with `pnpm innovain:leaderboard`. This replays the saved actions against the canonical scenarios and recalculates each score without making another model call. **Watch Run** likewise plays the saved replay offline. Replay verification proves the actions and score reproduce; it cannot independently prove model identity. See the [evaluation protocol and limitations](docs/benchmarking/innovain-top-10.md). Community submissions remain separate and cannot change Innovain results.
 
 This is a fictional research simulator, not a physically calibrated life-support model or a validated model benchmark. Only verified real-model evaluations will appear on Innovain's leaderboard; local practice and community runs remain separate. See the [public site map](docs/public-site.md).
 
 ## Contribute
 
-For general questions about Innovain Agent Arena, contact [info@innovain.com](mailto:info@innovain.com).
+Innovain is a Costa Rican startup and the steward of Agent Arena. We plan to keep improving the project, and welcome requests, ideas, bug reports, and collaboration from the community. Visit [innovain.ai](https://www.innovain.ai/) or write to [info@innovain.com](mailto:info@innovain.com).
 
 Start with [creating scenarios](docs/creating-scenarios.md), [architecture](docs/architecture.md), and [CONTRIBUTING.md](CONTRIBUTING.md). Contributions to incident design, Mars visuals, scoring, research protocols, and controlled model evaluation are welcome. Coding agents should read [AGENTS.md](AGENTS.md). See the [roadmap](docs/roadmap.md), [release checklist](docs/release-checklist.md), [security policy](SECURITY.md), and [community conduct](CODE_OF_CONDUCT.md).
 

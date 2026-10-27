@@ -1,0 +1,57 @@
+{
+  "formatVersion": 1,
+  "benchmarkId": "innovain-mars-arena",
+  "benchmarkVersion": "mars-operations-v2",
+  "source": "official",
+  "official": true,
+  "verified": true,
+  "evaluatedAt": "2026-10-27T03:16:06.803Z",
+  "seed": 183,
+  "model": {
+    "provider": "Microsoft Foundry",
+    "model": "gpt-6.1-sol",
+    "version": "2026-09-29",
+    "deployment": "gpt-6-1-sol-arena-test-20261026"
+  },
+  "connection": {
+    "endpoint": "https://laboratorytemp.openai.azure.com/openai/v1",
+    "api": "azure-openai-responses-v1",
+    "authentication": "api-key (secret not retained)"
+  },
+  "pricing": {
+    "id": "azure-foundry-gpt-6-1-sol-2026-10-26-globalstandard",
+    "effectiveDate": "2026-10-26",
+    "inputUsdPerMillionTokens": 2,
+    "outputUsdPerMillionTokens": 10,
+    "source": "Microsoft Foundry GPT-6.1 Sol Global Standard pricing, checked 2026-10-26"
+  },
+  "budget": {
+    "maxUsd": 3,
+    "maxInputTokens": 200000,
+    "maxOutputTokens": 50000,
+    "maxToolCalls": 30,
+    "attemptsPerIncident": 1,
+    "minRequestIntervalMs": 1000,
+    "requestTimeoutMs": 180000
+  },
+  "runs": [
+    {
+      "scenarioSlug": "habitat-b-leak-v2",
+      "attempt": 1,
+      "seed": 183,
+      "reference": "runs/habitat-b-leak-v2-attempt-01.json"
+    },
+    {
+      "scenarioSlug": "power-blackout-v2",
+      "attempt": 1,
+      "seed": 183,
+      "reference": "runs/power-blackout-v2-attempt-01.json"
+    },
+    {
+      "scenarioSlug": "oxygen-shortage-v2",
+      "attempt": 1,
+      "seed": 183,
+      "reference": "runs/oxygen-shortage-v2-attempt-01.json"
+    }
+  ]
+}

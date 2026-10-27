@@ -29,6 +29,7 @@ import type { LeaderboardArtifact } from '@arena/benchmarking';
 import { PublicPage } from './PublicPage';
 import {
   assetUrl,
+  publicLinks,
   resolveIncident,
   resolveRoute,
   routeHref,
@@ -283,19 +284,38 @@ export function App() {
               {item.label}
             </a>
           ))}
-          <span
-            className="site-nav-disabled"
-            title="Configure a real Git remote to enable this link"
+          <a
+            className="site-nav-external"
+            href={publicLinks.github}
+            target="_blank"
+            rel="noreferrer"
           >
-            GitHub
-          </span>
+            GitHub <ArrowUpRight size={11} />
+          </a>
         </nav>
+        <details className="innovain-menu">
+          <summary>
+            Innovain <ChevronDown size={12} />
+          </summary>
+          <div className="innovain-menu-panel">
+            <strong>Innovain Agent Arena</strong>
+            <a href={publicLinks.innovain} target="_blank" rel="noreferrer">
+              www.innovain.ai <ArrowUpRight size={12} />
+            </a>
+            <a href={publicLinks.contact}>{publicLinks.contactLabel}</a>
+          </div>
+        </details>
         <div className="header-center">
           <span className="status-dot" /> EXPERIMENTAL RESEARCH PLATFORM{' '}
           <span className="version">v0.1</span>
         </div>
-        <button className="text-button" onClick={() => setShowBriefing(true)}>
-          Mission briefing <ArrowUpRight size={15} />
+        <button
+          className="text-button"
+          title="Open the game guide and the selected mission briefing"
+          aria-label="How to play: open the game guide and mission briefing"
+          onClick={() => setShowBriefing(true)}
+        >
+          <CircleHelp size={15} /> How to play
         </button>
       </header>
       {route !== 'arena' ? (
@@ -728,8 +748,14 @@ export function App() {
               alt="innovain Agent Arena"
             />
             <span>SIMULATED WORLD · REAL TOOL CONSEQUENCES</span>
+            <div className="footer-contact" aria-label="Innovain contact links">
+              <a href={publicLinks.innovain} target="_blank" rel="noreferrer">
+                www.innovain.ai
+              </a>
+              <a href={publicLinks.contact}>{publicLinks.contactLabel}</a>
+            </div>
             <button onClick={() => setShowBriefing(true)}>
-              <CircleHelp size={13} /> How this works
+              <CircleHelp size={13} /> How to play
             </button>
           </footer>
         </main>
@@ -747,26 +773,26 @@ export function App() {
             className="briefing-modal"
             role="dialog"
             aria-modal="true"
-            aria-label="Mission briefing"
+            aria-label="Mission briefing and game guide"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="eyebrow">RESEARCH / MISSION BRIEFING</div>
-            <h2>One colony. Every decision matters.</h2>
+            <div className="eyebrow">GAME GUIDE / MISSION BRIEFING</div>
+            <h2>Understand the mission. Follow every consequence.</h2>
             <p className="briefing-text">
               {run?.metadata.briefing.replace(/^#{1,6}\s+/gm, '') ??
                 'Choose an emergency to load its public mission briefing.'}
             </p>
             <p>
-              Agents discover the available tools over MCP stdio. The world calculates outcomes.
-              This page plays recorded actions and state changes; no model is running in your
-              browser.
+              The mission briefing is the situation report for the selected emergency: it explains
+              what happened and what the agent must protect. Choose an emergency, then practice
+              manually or watch a saved run to see how each tool call changes the colony.
             </p>
             <p>
-              Compare the rescue and unsafe recordings. Scrub the timeline to inspect actions and
-              consequences. Scores appear after the mission ends.
+              This page replays recorded actions and state changes; it does not run a model in your
+              browser. Real-model evaluations and their saved runs are available in the Leaderboard.
             </p>
             <button className="watch-button" onClick={() => setShowBriefing(false)}>
-              BACK TO COLONY <ArrowUpRight size={16} />
+              BACK TO ARENA <ArrowUpRight size={16} />
             </button>
           </section>
         </div>

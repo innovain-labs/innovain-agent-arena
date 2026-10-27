@@ -1,0 +1,57 @@
+{
+  "formatVersion": 1,
+  "benchmarkId": "innovain-mars-arena",
+  "benchmarkVersion": "mars-operations-v2",
+  "source": "official",
+  "official": true,
+  "verified": true,
+  "evaluatedAt": "2026-10-27T03:52:34.618Z",
+  "seed": 183,
+  "model": {
+    "provider": "Microsoft Foundry",
+    "model": "Kimi-K2.7-Code",
+    "version": "2026-06-12",
+    "deployment": "kimi-k2-7-code-arena-test-20261026"
+  },
+  "connection": {
+    "endpoint": "https://laboratorytemp.openai.azure.com/openai/v1",
+    "api": "azure-openai-v1",
+    "authentication": "api-key (secret not retained)"
+  },
+  "pricing": {
+    "id": "azure-foundry-kimi-k2-7-code-2026-10-26-globalstandard",
+    "effectiveDate": "2026-10-26",
+    "inputUsdPerMillionTokens": 0.95,
+    "outputUsdPerMillionTokens": 4,
+    "source": "Moonshot AI published Kimi API pricing; proxy estimate for Azure Foundry usage (Azure public rate unavailable)"
+  },
+  "budget": {
+    "maxUsd": 1.8,
+    "maxInputTokens": 200000,
+    "maxOutputTokens": 100000,
+    "maxToolCalls": 30,
+    "attemptsPerIncident": 1,
+    "minRequestIntervalMs": 15000,
+    "requestTimeoutMs": 180000
+  },
+  "runs": [
+    {
+      "scenarioSlug": "habitat-b-leak-v2",
+      "attempt": 1,
+      "seed": 183,
+      "reference": "runs/habitat-b-leak-v2-attempt-01.json"
+    },
+    {
+      "scenarioSlug": "power-blackout-v2",
+      "attempt": 1,
+      "seed": 183,
+      "reference": "runs/power-blackout-v2-attempt-01.json"
+    },
+    {
+      "scenarioSlug": "oxygen-shortage-v2",
+      "attempt": 1,
+      "seed": 183,
+      "reference": "runs/oxygen-shortage-v2-attempt-01.json"
+    }
+  ]
+}

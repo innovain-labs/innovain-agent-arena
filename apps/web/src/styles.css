@@ -49,6 +49,8 @@ button:hover {
   margin: auto;
 }
 .header {
+  position: relative;
+  z-index: 20;
   height: 80px;
   padding: 0 36px;
   display: flex;
@@ -149,13 +151,80 @@ button:hover {
 .site-nav a.active {
   color: #f1f1e9;
 }
-.site-nav-disabled {
-  color: #58615a;
+.site-nav .site-nav-external {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.innovain-menu {
+  position: relative;
+  margin-right: 18px;
+  color: #9ca695;
   font: 9px var(--mono);
   letter-spacing: 0.8px;
   text-transform: uppercase;
   white-space: nowrap;
-  cursor: default;
+}
+.innovain-menu summary {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  list-style: none;
+}
+.innovain-menu summary::-webkit-details-marker {
+  display: none;
+}
+.innovain-menu summary:hover,
+.innovain-menu[open] summary {
+  color: #f1f1e9;
+}
+.innovain-menu summary:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 4px;
+}
+.innovain-menu-panel {
+  position: absolute;
+  top: calc(100% + 24px);
+  right: 0;
+  z-index: 30;
+  display: grid;
+  gap: 12px;
+  width: 240px;
+  padding: 17px;
+  border: 1px solid #465047;
+  background: #171b19;
+  box-shadow: 0 12px 32px #0009;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.innovain-menu-panel strong {
+  color: #e2e7dd;
+  font:
+    600 12px 'Inter',
+    sans-serif;
+}
+.innovain-menu-panel a,
+.about-contact-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #a9baa4;
+  text-decoration: none;
+  font: 10px var(--mono);
+  letter-spacing: 0.2px;
+}
+.innovain-menu-panel a:hover,
+.about-contact-links a:hover,
+.footer-contact a:hover {
+  color: #fff;
+}
+.about-inline-link {
+  color: var(--orange);
+  text-decoration: none;
+}
+.about-inline-link:hover {
+  text-decoration: underline;
 }
 main {
   padding: 0 36px;
@@ -254,7 +323,7 @@ h2 {
   margin: 10px 0 12px;
 }
 .incident-status {
-  font: 8px var(--mono);
+  font: 9px var(--mono);
   letter-spacing: 0.4px;
   color: #ffa573;
   padding: 8px 9px;
@@ -383,6 +452,7 @@ h2 {
   padding: 0 12px;
   margin-top: 13px;
   flex-shrink: 0;
+  text-decoration: none;
 }
 .watch-button svg:last-child {
   margin-left: auto;
@@ -1149,6 +1219,17 @@ h2 {
   object-position: left center;
   opacity: 0.84;
 }
+.footer-contact {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font: 8px var(--mono);
+  letter-spacing: 0;
+}
+.footer-contact a {
+  color: #8e9d80;
+  text-decoration: none;
+}
 .footer span:first-child {
   display: flex;
   gap: 7px;
@@ -1309,12 +1390,28 @@ h2 {
 @media (max-width: 1150px) {
   .header {
     padding: 0 22px;
+    height: auto;
+    min-height: 80px;
+    flex-wrap: wrap;
   }
   main {
     padding: 0 22px;
   }
   .header-center {
     display: none;
+  }
+  .site-nav {
+    order: 3;
+    width: 100%;
+    margin: 0;
+    padding: 11px 0;
+    overflow-x: auto;
+    border-top: 1px solid var(--line);
+    gap: 14px;
+  }
+  .innovain-menu {
+    margin-left: auto;
+    margin-right: 18px;
   }
   .arena {
     grid-template-columns: 210px minmax(300px, 1fr) 240px;
@@ -2159,6 +2256,13 @@ h2 {
     order: 3;
     width: 116px;
   }
+}
+
+.about-contact-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 18px;
+  margin-top: 18px;
 }
 .incident-selector {
   margin: 0 0 20px;

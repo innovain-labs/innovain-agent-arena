@@ -11,6 +11,13 @@ export const siteNavigation: Array<{ route: SiteRoute; label: string }> = [
   { route: 'about', label: 'About' },
 ];
 
+export const publicLinks = {
+  github: 'https://github.com/innovain-labs/innovain-agent-arena',
+  innovain: 'https://www.innovain.ai',
+  contact: 'mailto:info@innovain.com',
+  contactLabel: 'info@innovain.com',
+} as const;
+
 export function routeHref(route: SiteRoute): string {
   return `#/${route === 'arena' ? '' : route}`;
 }

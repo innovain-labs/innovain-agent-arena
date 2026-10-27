@@ -12,7 +12,7 @@
     "@arena/mars-world": "workspace:*",
     "@arena/replay": "workspace:*",
     "@arena/scoring": "workspace:*",
-    "@modelcontextprotocol/sdk": "1.32.1",
-    "yaml": "^2.8.0"
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "yaml": "^2.9.1"
   }
 }

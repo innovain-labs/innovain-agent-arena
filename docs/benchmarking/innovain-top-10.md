@@ -34,6 +34,59 @@ If a suite stops partway through, repeat it with `--resume --evaluation-id <same
 
 The v2 incident worlds are deterministic and do not vary with the seed. Repeated attempts therefore measure variation in model decisions from the same initial incident state; they are not independent world variants. Each completed result stores the actual decisions and replay so the score can be reproduced without calling Azure again.
 
+## GPT-6.1 Sol in Foundry
+
+GPT-6.1 Sol is listed by Microsoft Foundry as model version `2026-09-29`; its function and tool calling uses the Responses API. The runner's `--api-mode responses` option calls that API, supplies the real Mars MCP tool schemas, executes the returned function calls in the local MCP session, and passes each result back through the response chain. This evaluation used one attempt for each of the three emergencies, reasoning effort `medium`, and a 180-second request timeout. Microsoft's published Global Standard rates checked on 2026-10-26 were **US$2 / million input tokens** and **US$10 / million output tokens**; see the [model catalog](https://learn.microsoft.com/en-us/azure/foundry/foundry-models/concepts/models-sold-directly-by-azure) and [token pricing and weights](https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/provisioned-throughput-sizing).
+
+The verified suite scored **100/100** across the three completed missions. The individual replay scores were 96.895 for the Habitat B leak, 93.784 for the blackout, and 88.500 for the oxygen crisis. Total usage was 51,428 tokens and the conservative estimate was **US$0.114**. The suite score aggregates success, crew survival, safety and efficiency; it is not the arithmetic mean of the three per-run scores. The run records and cost snapshot are in [`gpt-6-1-sol-20261027T031606803z`](../../benchmarks/innovain-arena/evaluations/gpt-6-1-sol-20261027T031606803z/evaluation.json). The temporary deployment was deleted after the run; only the saved, replay-verified evaluation remains.
+
+To reproduce, first confirm current pricing and available Global Standard quota. Standard deployment capacity controls request throughput; it is pay-per-token, unlike provisioned throughput, which is billed by reserved capacity. The example's 250 capacity units matched the available quota for this evaluation and provided ample throughput for the sequential suite.
+
+```powershell
+az cognitiveservices account deployment create `
+  --resource-group RESOURCE_GROUP `
+  --name FOUNDRY_ACCOUNT `
+  --deployment-name gpt-6-1-sol-arena-test `
+  --model-name gpt-6.1-sol `
+  --model-version 2026-09-29 `
+  --model-format OpenAI `
+  --sku-name GlobalStandard `
+  --sku-capacity 250
+
+$env:AZURE_OPENAI_API_KEY = az cognitiveservices account keys list `
+  --resource-group RESOURCE_GROUP `
+  --name FOUNDRY_ACCOUNT `
+  --query key1 -o tsv
+pnpm innovain:evaluate -- `
+  --provider foundry `
+  --api-mode responses `
+  --base-url https://FOUNDRY_ACCOUNT.openai.azure.com/openai/v1 `
+  --model gpt-6-1-sol-arena-test `
+  --catalog-model gpt-6.1-sol `
+  --catalog-version 2026-09-29 `
+  --region REGION `
+  --deployment-type GlobalStandard `
+  --attempts 1 `
+  --seed 183 `
+  --suite-budget-usd 3 `
+  --max-input-tokens 200000 `
+  --max-output-tokens 50000 `
+  --max-tool-calls 30 `
+  --request-timeout-ms 180000 `
+  --min-request-interval-ms 1000 `
+  --input-price-usd-per-million 2 `
+  --output-price-usd-per-million 10 `
+  --price-effective-date 2026-10-26 `
+  --price-source 'Microsoft Foundry GPT-6.1 Sol Global Standard pricing, checked 2026-10-26'
+Remove-Item Env:AZURE_OPENAI_API_KEY
+az cognitiveservices account deployment delete `
+  --resource-group RESOURCE_GROUP `
+  --name FOUNDRY_ACCOUNT `
+  --deployment-name gpt-6-1-sol-arena-test
+```
+
+The suite ceiling is US$3, but the three completed runs used an estimated **US$0.114**. The recorded estimate prices all input tokens at the uncached rate and may differ from the Azure invoice or account-specific offer. Deleting the deployment stops future inference; Azure still bills for already-used tokens.
+
 ## Claude Haiku 5.5 in Foundry
 
 Claude models use Foundry's Anthropic Messages API (`/anthropic/v1/messages`), so the official evaluator records the API contract separately from Azure OpenAI. This command runs one attempt for each of the three emergencies against the Azure-hosted Claude Haiku 5.5 deployment, caps the suite at **$0.04 estimated token cost**, and retains no key in the evaluation files. Foundry lists Hosted on Azure as model version `2`; confirm the model card and pricing before a future rerun. Foundry requires accepting the Anthropic Marketplace offer and providing accurate organization details during deployment.

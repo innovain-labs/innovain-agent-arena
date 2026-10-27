@@ -4,7 +4,7 @@ import type { LeaderboardArtifact } from '@arena/benchmarking';
 import { ArrowUpRight, FileUp, Github, LockKeyhole, Terminal, ExternalLink } from 'lucide-react';
 import { ExperimentPanel } from './ExperimentPanel';
 import { LeaderboardPanel } from './LeaderboardPanel';
-import { assetUrl, routeHref, type SiteRoute } from './site';
+import { assetUrl, publicLinks, routeHref, type SiteRoute } from './site';
 import { currentMarsIncidents } from '@arena/mars-world';
 
 interface PublicPageProps {
@@ -338,10 +338,10 @@ export function PublicPage({
           src={assetUrl('innovain-agent-arena-logo.png')}
           alt="innovain Agent Arena"
         />
-        <h1>About Agent Arena</h1>
+        <h1>About Innovain Agent Arena</h1>
         <p>
-          Agent Arena is a transparent environment for studying how models select tools when the
-          world remembers every consequence.
+          An open source research project by Innovain for studying how AI agents choose tools when
+          the world remembers every consequence.
         </p>
       </div>
       <div className="about-grid">
@@ -362,11 +362,25 @@ export function PublicPage({
           </p>
         </article>
         <article className="research-card">
-          <h2>Build with it</h2>
+          <h2>Built by Innovain</h2>
           <p>
-            Scenarios are YAML, the MCP server is local stdio, runs are JSON, and the renderer is
-            React plus procedural Three.js. Read the authoring and runner docs to contribute.
+            Innovain develops this open source arena to make agent decisions visible, reproducible,
+            and easier to discuss. The company also offers an enterprise tool for comprehensive MCP
+            governance with any AI model, including locally hosted models. For more information,
+            visit{' '}
+            <a
+              className="about-inline-link"
+              href={publicLinks.innovain}
+              target="_blank"
+              rel="noreferrer"
+            >
+              www.innovain.ai
+            </a>
+            .
           </p>
+          <div className="about-contact-links">
+            <a href={publicLinks.contact}>{publicLinks.contactLabel}</a>
+          </div>
         </article>
       </div>
       <section className="docs-card">
@@ -374,10 +388,13 @@ export function PublicPage({
         <div>
           <h2>Community contribution</h2>
           <p>
-            Open a pull request with a scenario, replay, scoring proposal, or research note. This
-            checkout has no configured remote yet, so the public site does not invent a GitHub URL.
+            Explore the source and open a pull request with a scenario, replay, scoring proposal, or
+            research note.
           </p>
         </div>
+        <a className="watch-button" href={publicLinks.github} target="_blank" rel="noreferrer">
+          VIEW ON GITHUB <ArrowUpRight size={14} />
+        </a>
       </section>
     </main>
   );

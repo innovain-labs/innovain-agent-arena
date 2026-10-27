@@ -11,4 +11,4 @@ The web app is organized around hash routes so the static Vite preview works wit
 
 All public copy is English. The viewer never calls a model provider. It fetches bundled artifacts and reads a user-selected `run.json` through the browser File API. Imported files remain on the user's machine.
 
-GitHub navigation is intentionally omitted until a real repository remote is configured. The app must never invent a repository URL.
+The header links to Innovain, the configured project repository, and the general contact address. The About page repeats the company website and email so visitors can identify the project steward and reach the team.

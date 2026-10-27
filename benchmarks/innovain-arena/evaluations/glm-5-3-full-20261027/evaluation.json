@@ -1,0 +1,57 @@
+{
+  "formatVersion": 1,
+  "benchmarkId": "innovain-mars-arena",
+  "benchmarkVersion": "mars-operations-v2",
+  "source": "official",
+  "official": true,
+  "verified": true,
+  "evaluatedAt": "2026-10-27T06:04:54.905Z",
+  "seed": 183,
+  "model": {
+    "provider": "Microsoft Foundry",
+    "model": "FW-GLM-5.3",
+    "version": "2",
+    "deployment": "glm-5-3-arena-test"
+  },
+  "connection": {
+    "endpoint": "https://laboratorytemp.services.ai.azure.com/api/projects/proj-default/openai/v1",
+    "api": "azure-openai-v1",
+    "authentication": "api-key (secret not retained)"
+  },
+  "pricing": {
+    "id": "azure-foundry-fw-glm-5-3-2026-09-01-datazonestandard",
+    "effectiveDate": "2026-09-01",
+    "inputUsdPerMillionTokens": 2.1,
+    "outputUsdPerMillionTokens": 6.6,
+    "source": "Azure Retail Prices API via AzureSpeed, East US Data Zone Standard, checked 2026-10-26"
+  },
+  "budget": {
+    "maxUsd": 1.8,
+    "maxInputTokens": 150000,
+    "maxOutputTokens": 40000,
+    "maxToolCalls": 60,
+    "attemptsPerIncident": 1,
+    "minRequestIntervalMs": 20000,
+    "requestTimeoutMs": 360000
+  },
+  "runs": [
+    {
+      "scenarioSlug": "habitat-b-leak-v2",
+      "attempt": 1,
+      "seed": 183,
+      "reference": "runs/habitat-b-leak-v2-attempt-01.json"
+    },
+    {
+      "scenarioSlug": "power-blackout-v2",
+      "attempt": 1,
+      "seed": 183,
+      "reference": "runs/power-blackout-v2-attempt-01.json"
+    },
+    {
+      "scenarioSlug": "oxygen-shortage-v2",
+      "attempt": 1,
+      "seed": 183,
+      "reference": "runs/oxygen-shortage-v2-attempt-01.json"
+    }
+  ]
+}

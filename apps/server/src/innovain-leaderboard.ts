@@ -32,7 +32,7 @@ export interface InnovainEvaluationManifest {
   };
   connection: {
     endpoint: string;
-    api: 'azure-openai-v1' | 'anthropic-messages-v1';
+    api: 'azure-openai-v1' | 'azure-openai-responses-v1' | 'anthropic-messages-v1';
     authentication: 'api-key (secret not retained)' | 'x-api-key (secret not retained)';
   };
   pricing: {
@@ -48,6 +48,8 @@ export interface InnovainEvaluationManifest {
     maxOutputTokens: number;
     maxToolCalls: number;
     attemptsPerIncident: number;
+    minRequestIntervalMs?: number;
+    requestTimeoutMs?: number;
   };
   runs: Array<{
     scenarioSlug: string;
@@ -92,6 +94,8 @@ async function loadOfficialEvaluation(directory: string) {
     !manifest.connection?.endpoint ||
     !(
       (manifest.connection.api === 'azure-openai-v1' &&
+        manifest.connection.authentication === 'api-key (secret not retained)') ||
+      (manifest.connection.api === 'azure-openai-responses-v1' &&
         manifest.connection.authentication === 'api-key (secret not retained)') ||
       (manifest.connection.api === 'anthropic-messages-v1' &&
         manifest.connection.authentication === 'x-api-key (secret not retained)')

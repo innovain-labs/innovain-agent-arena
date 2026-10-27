@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { resolveIncident, resolveRoute, routeHref, siteNavigation } from './site';
+import { publicLinks, resolveIncident, resolveRoute, routeHref, siteNavigation } from './site';
 
 describe('public site routing', () => {
   it('keeps static-preview routes stable', () => {
@@ -18,6 +18,14 @@ describe('public site routing', () => {
       'try-your-model',
       'about',
     ]);
+  });
+  it('links to Innovain, its public contact, and the configured repository', () => {
+    expect(publicLinks).toEqual({
+      github: 'https://github.com/innovain-labs/innovain-agent-arena',
+      innovain: 'https://www.innovain.ai',
+      contact: 'mailto:info@innovain.com',
+      contactLabel: 'info@innovain.com',
+    });
   });
   it('opens a catalog incident from a shareable arena link', () => {
     expect(resolveRoute('#/?incident=power-blackout')).toBe('arena');

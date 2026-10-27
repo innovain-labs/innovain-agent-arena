@@ -37,6 +37,7 @@ async function readResumableRun(
   modelVersion: string,
   pricingId: string,
   provider: LocalRunOptions['provider'],
+  apiMode: LocalRunOptions['apiMode'],
   canonical: Awaited<ReturnType<typeof loadScenario>>,
 ): Promise<Run | undefined> {
   try {
@@ -55,6 +56,9 @@ async function readResumableRun(
         model?.provider === provider ||
         (['foundry', 'anthropic'].includes(provider) && model?.provider === 'Microsoft Foundry')
       ) ||
+      (apiMode === 'responses' &&
+        model.configuration?.api !==
+          (alreadyPromoted ? 'azure-openai-responses-v1' : 'responses')) ||
       (model?.deployment ?? model?.model) !== deployment ||
       (alreadyPromoted && model.version !== modelVersion) ||
       (model.configuration?.stopReason &&
@@ -78,7 +82,10 @@ async function readResumableRun(
 export function foundryConnectionFor(options: LocalRunOptions) {
   if (options.provider === 'foundry')
     return {
-      api: 'azure-openai-v1' as const,
+      api:
+        options.apiMode === 'responses'
+          ? ('azure-openai-responses-v1' as const)
+          : ('azure-openai-v1' as const),
       authentication: 'api-key (secret not retained)' as const,
     };
   if (options.provider !== 'anthropic' || !options.baseUrl)
@@ -211,6 +218,7 @@ export async function runInnovainEvaluation(argv: string[]): Promise<void> {
             modelVersion,
             pricingId,
             options.provider,
+            options.apiMode,
             canonical,
           )
         : undefined;
@@ -245,9 +253,11 @@ export async function runInnovainEvaluation(argv: string[]): Promise<void> {
         deployment: options.model,
         configuration: {
           runner: 'innovain-evaluation-v1',
+          api: connection.api,
           region,
           deploymentType,
           endpoint: options.baseUrl,
+          ...(options.apiMode === 'responses' ? { reasoningEffort: 'medium' } : {}),
           ...(typeof reportedModel === 'string' ? { providerReportedModel: reportedModel } : {}),
           ...(typeof stopReason === 'string' ? { stopReason } : {}),
         },
@@ -299,6 +309,7 @@ export async function runInnovainEvaluation(argv: string[]): Promise<void> {
       maxToolCalls: options.maxToolCalls,
       attemptsPerIncident,
       minRequestIntervalMs: options.minRequestIntervalMs,
+      requestTimeoutMs: options.requestTimeoutMs,
     },
     runs: officialRuns,
   };
