@@ -25,7 +25,7 @@ The viewer is static and makes no model calls. GitHub Pages needs a deployment w
 
 ## Azure Linux App Service option
 
-The current site is a React/Vite static viewer; the model runner and MCP stdio server are local tools, not part of a hosted backend. The repository has no production HTTP server, container definition, or Azure deployment workflow yet. `pnpm build` creates `apps/web/dist`; `pnpm preview` is for local review only. A Linux App Service deployment needs a production static-file server or container that serves this build on App Service's `PORT`, followed by a smoke test of assets, replay files, and hash-based routes. An existing Linux App Service plan can host the app, but plan capacity alone does not create or configure a web app. Confirm the target app, domain, TLS, and deployment path before making any Azure changes.
+The current site is a React/Vite static viewer; the model runner and MCP stdio server remain local tools, not part of a hosted backend. `pnpm build` creates `apps/web/dist`, and `apps/web/server.mjs` serves the static build on App Service's `PORT` without adding runtime dependencies. `pnpm preview` remains for local review. A Linux App Service deployment uses the Node 24 LTS runtime, the `node server.mjs` startup command, and a ZIP containing the server and built `dist/` folder, followed by a smoke test of assets, replay files, and hash-based routes. An existing Linux App Service plan can host the app if it has capacity; confirm the target app, domain, and TLS before deployment.
 
 ## Release wording
 
