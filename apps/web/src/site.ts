@@ -1,6 +1,6 @@
 import { currentMarsIncidents, marsIncidents } from '@arena/mars-world';
 export type SiteRoute =
-  'arena' | 'leaderboard' | 'research' | 'scenarios' | 'try-your-model' | 'about';
+  'arena' | 'leaderboard' | 'research' | 'scenarios' | 'try-your-model' | 'about' | 'privacy';
 
 export const siteNavigation: Array<{ route: SiteRoute; label: string }> = [
   { route: 'arena', label: 'Arena' },
@@ -12,7 +12,7 @@ export const siteNavigation: Array<{ route: SiteRoute; label: string }> = [
 ];
 
 export const publicLinks = {
-  github: 'https://github.com/innovain-labs/innovain-agent-arena',
+  github: import.meta.env.VITE_PUBLIC_REPOSITORY_URL?.trim() || null,
   innovain: 'https://www.innovain.ai',
   contact: 'mailto:info@innovain.com',
   contactLabel: 'info@innovain.com',
@@ -29,7 +29,8 @@ export function resolveRoute(hash: string): SiteRoute {
     route === 'research' ||
     route === 'scenarios' ||
     route === 'try-your-model' ||
-    route === 'about'
+    route === 'about' ||
+    route === 'privacy'
   )
     return route;
   return 'arena';

@@ -234,9 +234,11 @@ export function PublicPage({
               <FileUp size={15} /> Open local run.json
             </button>
             <p>
-              Verify with <code>node arena.mjs verify --directory arena-results</code>, review the
-              files, then submit via a GitHub pull request. Importing a replay here does not publish
-              it.
+              Verify with <code>node arena.mjs verify --directory arena-results</code> and review
+              the files. Importing a replay here does not publish it.{' '}
+              {publicLinks.github
+                ? 'Reviewed suites can be submitted through a data-only GitHub pull request.'
+                : 'Community submissions will open with the public source release.'}
             </p>
             <a className="inline-link" href={assetUrl('docs/community-leaderboard.md')}>
               Community verification and submission guide
@@ -329,10 +331,52 @@ export function PublicPage({
         </section>
       </main>
     );
+  if (route === 'privacy')
+    return (
+      <main className="public-page">
+        <div className="page-heading">
+          <span className="eyebrow">PRIVACY / PUBLIC VIEWER</span>
+          <h1>Privacy at Agent Arena</h1>
+          <p>What this website does and does not send outside your browser.</p>
+        </div>
+        <section className="copy-section privacy-content">
+          <h2>Provider credentials and model calls</h2>
+          <p>
+            The public viewer does not ask for, collect, or transmit AI provider API keys. It plays
+            bundled recordings and does not call model providers. Real-model experiments run from
+            the local runner on the participant’s computer; the participant connects directly to
+            their chosen provider and is responsible for that provider’s terms and charges.
+          </p>
+          <h2>Files and community submissions</h2>
+          <p>
+            When you import a replay, your browser reads the selected JSON file locally. The viewer
+            does not upload that file. Community results are not submitted automatically, and the
+            Community board is not accepting submissions while the source repository is private.
+            When contributions open, GitHub will process them under its own terms and privacy
+            practices.
+          </p>
+          <h2>Website operations</h2>
+          <p>
+            The site is hosted on Microsoft Azure. The hosting service may process technical request
+            and security information needed to deliver and protect the site. Innovain has not added
+            advertising, analytics, account registration, or a server-side model execution service
+            to this viewer.
+          </p>
+          <p>
+            Questions about this notice can be sent to{' '}
+            <a className="about-inline-link" href={publicLinks.contact}>
+              {publicLinks.contactLabel}
+            </a>
+            . This notice applies to the hosted viewer; local tools, GitHub, and AI providers have
+            their own data practices.
+          </p>
+        </section>
+      </main>
+    );
   return (
     <main className="public-page">
       <div className="page-heading">
-        <span className="eyebrow">OPEN SOURCE / RESEARCH TOOL</span>
+        <span className="eyebrow">AGENT RESEARCH / PUBLIC DEMO</span>
         <img
           className="about-logo"
           src={assetUrl('innovain-agent-arena-logo.png')}
@@ -340,8 +384,8 @@ export function PublicPage({
         />
         <h1>About Innovain Agent Arena</h1>
         <p>
-          An open source research project by Innovain for studying how AI agents choose tools when
-          the world remembers every consequence.
+          An experimental research demo by Innovain for studying how AI agents choose tools when the
+          world remembers every consequence.
         </p>
       </div>
       <div className="about-grid">
@@ -364,8 +408,8 @@ export function PublicPage({
         <article className="research-card">
           <h2>Built by Innovain</h2>
           <p>
-            Innovain develops this open source arena to make agent decisions visible, reproducible,
-            and easier to discuss. The company also offers an enterprise tool for comprehensive MCP
+            Innovain develops this research arena to make agent decisions visible, reproducible, and
+            easier to discuss. The company also offers an enterprise tool for comprehensive MCP
             governance with any AI model, including locally hosted models. For more information,
             visit{' '}
             <a
@@ -384,17 +428,22 @@ export function PublicPage({
         </article>
       </div>
       <section className="docs-card">
-        <Github size={20} />
+        {publicLinks.github ? <Github size={20} /> : <LockKeyhole size={20} />}
         <div>
-          <h2>Community contribution</h2>
+          <h2>
+            {publicLinks.github ? 'Community contribution' : 'Open-source release in preparation'}
+          </h2>
           <p>
-            Explore the source and open a pull request with a scenario, replay, scoring proposal, or
-            research note.
+            {publicLinks.github
+              ? 'Explore the source and open a pull request with a scenario, replay, scoring proposal, or research note.'
+              : 'The public demo is ready to explore. Source access and community pull requests will open with the repository release.'}
           </p>
         </div>
-        <a className="watch-button" href={publicLinks.github} target="_blank" rel="noreferrer">
-          VIEW ON GITHUB <ArrowUpRight size={14} />
-        </a>
+        {publicLinks.github && (
+          <a className="watch-button" href={publicLinks.github} target="_blank" rel="noreferrer">
+            VIEW ON GITHUB <ArrowUpRight size={14} />
+          </a>
+        )}
       </section>
     </main>
   );

@@ -2,6 +2,8 @@
 
 Innovain's official board and the Community Top 10 are separate artifacts and separate evaluations. Local commands and browser imports never upload or modify either board.
 
+**Current intake status:** Community contributions are not open while the source repository is private. You can run and verify a suite locally; pull-request submission will open with the public source release.
+
 ## Current implementation: reviewed contributions
 
 The Community Top 10 uses the three current Mars emergencies: habitat pressure leak, life-support blackout and oxygen shortage. Run each using the local runner and your own model configuration. The current suite uses the canonical initial states and seed metadata 183. It is a small demonstration suite, not a repeated model-quality study. Scripted or human-assisted decisions must be disclosed as such.

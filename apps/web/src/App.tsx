@@ -284,14 +284,16 @@ export function App() {
               {item.label}
             </a>
           ))}
-          <a
-            className="site-nav-external"
-            href={publicLinks.github}
-            target="_blank"
-            rel="noreferrer"
-          >
-            GitHub <ArrowUpRight size={11} />
-          </a>
+          {publicLinks.github && (
+            <a
+              className="site-nav-external"
+              href={publicLinks.github}
+              target="_blank"
+              rel="noreferrer"
+            >
+              GitHub <ArrowUpRight size={11} />
+            </a>
+          )}
         </nav>
         <details className="innovain-menu">
           <summary>
@@ -303,6 +305,7 @@ export function App() {
               www.innovain.ai <ArrowUpRight size={12} />
             </a>
             <a href={publicLinks.contact}>{publicLinks.contactLabel}</a>
+            <a href={routeHref('privacy')}>Privacy</a>
           </div>
         </details>
         <div className="header-center">
@@ -740,7 +743,7 @@ export function App() {
           </section>
           <footer className="footer">
             <span>
-              <span className="tiny-square" /> OPEN SOURCE. OPEN QUESTIONS.
+              <span className="tiny-square" /> PUBLIC DEMO · OPEN QUESTIONS
             </span>
             <img
               className="footer-logo"

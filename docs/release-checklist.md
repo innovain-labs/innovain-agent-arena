@@ -17,7 +17,17 @@ Use your personal GitHub account to administer an Innovain organization, and cre
 
 ## GitHub setup
 
-Review the existing private repository, confirm its organization remote and branch protections, then publish only as part of the owner's launch decision. Confirm the Linux CI workflow passes. Configure private vulnerability reporting, a conduct contact, Dependabot, and suitable default-branch protections. Add the real remote URL to the public viewer.
+Review the existing private repository, confirm its organization remote and branch protections, then publish only as part of the owner's launch decision. Confirm the Linux CI workflow passes. Ensure `info@innovain.com` is monitored for confidential vulnerability reports; after the repository is public, enable GitHub private vulnerability reporting. Configure a conduct contact, Dependabot, and suitable default-branch protections. Add the real remote URL to the public viewer only when the source repository is public.
+
+## Innovain launch gate
+
+- Keep the GitHub repository private while the demo uses the Azure default hostname.
+- Configure `arena.innovain.ai`, bind HTTPS, and verify the custom hostname from a clean browser before making the repository public.
+- Confirm `info@innovain.com` is monitored for confidential vulnerability reports before public release. Immediately after changing repository visibility to public, enable GitHub private vulnerability reporting and verify the Report a vulnerability channel; GitHub currently offers this feature for public repositories.
+- Confirm the exact `main` commit has a green CI run before public release.
+- Keep `VITE_PUBLIC_REPOSITORY_URL` unset while the GitHub repository is private. Set it to the real repository URL only for the public-source release build.
+- Publish the site's Privacy page and social preview metadata/card with the demo. Update the Open Graph canonical URL and image host to `arena.innovain.ai` when DNS and HTTPS are ready.
+- Stage only reviewed files. Keep incomplete local model evaluation directories out of the release.
 
 ## Optional public demo
 

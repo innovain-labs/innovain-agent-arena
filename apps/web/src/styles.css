@@ -1990,6 +1990,23 @@ h2 {
   color: #929990;
   font-size: 13px;
 }
+.privacy-content {
+  max-width: 860px;
+}
+.privacy-content h2 {
+  margin: 26px 0 8px;
+  color: #e7e8e1;
+  font-size: 17px;
+}
+.privacy-content h2:first-child {
+  margin-top: 0;
+}
+.privacy-content p {
+  max-width: 800px;
+  color: #929990;
+  font-size: 13px;
+  line-height: 1.75;
+}
 .copy-columns {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

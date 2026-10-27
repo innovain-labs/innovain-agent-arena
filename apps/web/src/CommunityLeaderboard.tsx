@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { assetUrl } from './site';
+import { assetUrl, publicLinks } from './site';
 interface Board {
   suite: string;
   toolContractVersion: string;
@@ -78,8 +78,9 @@ export function CommunityLeaderboard({ onWatchRun }: { onWatchRun: (reference: s
               {!board.entries.length && (
                 <tr>
                   <td colSpan={5} className="leaderboard-empty">
-                    The first community spot is open. Submit one completed replay for each
-                    emergency.
+                    {publicLinks.github
+                      ? 'The first community spot is open. Submit one completed replay for each emergency.'
+                      : 'Community submissions will open with the public source release. You can still run and verify the suite locally.'}
                   </td>
                 </tr>
               )}
@@ -92,7 +93,7 @@ export function CommunityLeaderboard({ onWatchRun }: { onWatchRun: (reference: s
           Download runner · play the complete suite
         </a>
         <a className="inline-link" href={assetUrl('docs/community-leaderboard.md')}>
-          How to submit · keys stay local
+          Community guide · keys stay local
         </a>
         <span>REVIEWED SUBMISSIONS · NO AUTOMATIC UPLOAD</span>
       </div>

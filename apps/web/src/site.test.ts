@@ -5,6 +5,7 @@ describe('public site routing', () => {
   it('keeps static-preview routes stable', () => {
     expect(resolveRoute('#/leaderboard')).toBe('leaderboard');
     expect(resolveRoute('#/try-your-model')).toBe('try-your-model');
+    expect(resolveRoute('#/privacy')).toBe('privacy');
     expect(resolveRoute('#/unknown')).toBe('arena');
     expect(routeHref('arena')).toBe('#/');
   });
@@ -19,9 +20,9 @@ describe('public site routing', () => {
       'about',
     ]);
   });
-  it('links to Innovain, its public contact, and the configured repository', () => {
+  it('keeps the private source link hidden until a public URL is configured', () => {
     expect(publicLinks).toEqual({
-      github: 'https://github.com/innovain-labs/innovain-agent-arena',
+      github: null,
       innovain: 'https://www.innovain.ai',
       contact: 'mailto:info@innovain.com',
       contactLabel: 'info@innovain.com',
