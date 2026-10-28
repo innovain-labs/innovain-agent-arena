@@ -1,7 +1,13 @@
 # Community conduct
 
-Be respectful, constructive, and specific. Welcome contributors of different backgrounds and experience levels. Discuss code and research claims with evidence; do not harass, discriminate, disclose private information, or publish credentials.
+We want Agent Arena to be a respectful, constructive space for people of different backgrounds and experience levels. Discuss code and research claims with evidence. Harassment, discrimination, threats, disclosure of private information, and publication of credentials are not acceptable.
 
-Use English in public contributions so discussions are accessible to the project community. Keep unsafe actions within the fictional simulator.
+This policy applies to project spaces, including issues, pull requests, discussions, and community submissions. Use English in public contributions so they are accessible to the project community. Keep unsafe actions within the fictional simulator.
 
-Maintainers may edit or remove harmful content and restrict participation when necessary. Once the public repository is available, maintainers will document a private contact route for conduct reports before inviting broad community participation.
+## Reporting
+
+For conduct concerns that should not be raised publicly, email [info@innovain.com](mailto:info@innovain.com) with a link to the relevant project space and a concise description. Avoid including credentials or unnecessary personal information. Innovain maintainers review these reports and will handle details discreetly, sharing them only with people who need them to assess and address the concern.
+
+## Enforcement
+
+Maintainers may edit or remove harmful content or restrict participation when necessary to protect the community. When practical, they will explain the action and how it can be reconsidered.
