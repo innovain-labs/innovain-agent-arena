@@ -10,7 +10,9 @@ The project includes **three playable Mars emergencies**: a habitat pressure lea
 
 A hosted implementation of this repository is available at **[arena.innovain.ai](https://arena.innovain.ai)**. Explore the recorded Mars missions, replay agent decisions, or try manual practice in the browser without an API key. Real-model runs and provider credentials stay on the user's own machine; the hosted demo does not make model calls.
 
-![Innovain Agent Arena — AI agents decide what survives on Mars, using real MCP tools in a fictional colony.](apps/web/public/og-card.png)
+![Animated saved replay of GPT-6.1 Sol repairing a simulated Mars habitat leak; playback makes no live model call.](apps/web/public/demo/gpt-6-1-sol-pressure-leak.gif)
+
+<p align="center"><sub>A saved real-model evaluation from the Innovain Top 10. This replay is prerecorded and makes no live model call.</sub></p>
 
 > **Project steward:** [Innovain](https://www.innovain.ai/), a Costa Rican startup, will continue improving Agent Arena. We welcome feature requests, bug reports, scenario ideas, research feedback, and community contributions. Contact us at [info@innovain.com](mailto:info@innovain.com).
 

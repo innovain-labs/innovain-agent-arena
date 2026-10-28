@@ -339,7 +339,7 @@ export function App() {
       ) : (
         <main>
           <section className="masthead">
-            <div className="masthead-copy">
+            <div>
               <div className="eyebrow">
                 WORLD 01 <span>/</span> MARS COLONY ALPHA
               </div>
@@ -347,10 +347,9 @@ export function App() {
                 AI decisions. <em>Real consequences.</em>
               </h1>
               <p>Watch AI agents. Take the controls. Every decision has a cost.</p>
-              <p className="masthead-question">
-                Can an AI agent save the colony without making things worse?
-              </p>
-              <span className="live-label scenario-live-label">
+            </div>
+            <div className="masthead-right">
+              <span className="live-label">
                 <Radio size={13} />{' '}
                 {run?.metadata.protocol === 'browser/manual'
                   ? 'MANUAL PRACTICE'
@@ -360,41 +359,12 @@ export function App() {
                       ? 'SCRIPTED DEMO · NO LLM'
                       : 'SAVED RECORDING · MODEL UNKNOWN'}
               </span>
+              <p>
+                Can an AI agent save the colony
+                <br />
+                without making things worse?
+              </p>
             </div>
-            <a
-              className="featured-run-card"
-              href={routeHref('leaderboard')}
-              aria-label="Open the Leaderboard to replay GPT-6.1 Sol's saved Pressure Leak mission. This replay makes no live model call."
-            >
-              <span className="featured-run-media">
-                <img
-                  className="featured-run-gif"
-                  src={assetUrl('demo/gpt-6-1-sol-pressure-leak.gif')}
-                  alt="Recorded GPT-6.1 Sol run: the Habitat B pressure leak is isolated and repaired, the oxygen supply is restored, and all 16 crew survive."
-                  decoding="async"
-                />
-                <img
-                  className="featured-run-poster"
-                  src={assetUrl('demo/gpt-6-1-sol-pressure-leak-poster.jpg')}
-                  alt=""
-                  aria-hidden="true"
-                />
-                <span className="featured-run-flag">SAVED MODEL REPLAY · NO LIVE CALL</span>
-                <span className="featured-run-play" aria-hidden="true">
-                  <Play size={17} fill="currentColor" />
-                </span>
-              </span>
-              <span className="featured-run-copy">
-                <span className="featured-run-label">INNOVAIN TOP 10 · REAL MODEL EVALUATION</span>
-                <span className="featured-run-title">GPT-6.1 Sol</span>
-                <span className="featured-run-detail">
-                  Pressure Leak / Repair Drone · 96.9 run score
-                </span>
-                <span className="featured-run-action">
-                  Explore the Leaderboard <ArrowUpRight size={13} />
-                </span>
-              </span>
-            </a>
           </section>
           <section className="incident-selector" aria-labelledby="incident-selector-title">
             <div className="incident-selector-heading">
