@@ -349,11 +349,10 @@ export function PublicPage({
           </p>
           <h2>Files and community submissions</h2>
           <p>
-            When you import a replay, your browser reads the selected JSON file locally. The viewer
-            does not upload that file. Community results are not submitted automatically, and the
-            Community board is not accepting submissions while the source repository is private.
-            When contributions open, GitHub will process them under its own terms and privacy
-            practices.
+            When you import a replay, your browser reads the selected JSON file locally and the
+            viewer does not upload it. Community runs are not submitted automatically. If you choose
+            to submit a run or pull request through GitHub, review its contents first; GitHub
+            handles that information under its own privacy practices.
           </p>
           <h2>Website operations</h2>
           <p>

@@ -2,7 +2,7 @@
 
 Innovain's official board and the Community Top 10 are separate artifacts and separate evaluations. Local commands and browser imports never upload or modify either board.
 
-**Current intake status:** Community contributions are not open while the source repository is private. You can run and verify a suite locally; pull-request submission will open with the public source release.
+**Submission route:** Community contributions are reviewed through pull requests. The runner creates local result files and never uploads them automatically. Review every file before submitting; never include provider credentials or unreviewed logs.
 
 ## Current implementation: reviewed contributions
 
