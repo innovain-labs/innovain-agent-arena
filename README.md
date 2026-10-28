@@ -6,6 +6,12 @@ An open-source experiment in agent behavior, told through a simulated survival w
 
 The project includes **three playable Mars emergencies**: a habitat pressure leak, a life-support blackout, and a critical oxygen shortage. Each has rescue and failure recordings generated through an actual MCP stdio client/server session. The browser replays recordings without any LLM calls.
 
+## Live demo
+
+A hosted implementation of this repository is available at **[arena.innovain.ai](https://arena.innovain.ai)**. Explore the recorded Mars missions, replay agent decisions, or try manual practice in the browser without an API key. Real-model runs and provider credentials stay on the user's own machine; the hosted demo does not make model calls.
+
+![Innovain Agent Arena — AI agents decide what survives on Mars, using real MCP tools in a fictional colony.](apps/web/public/og-card.png)
+
 > **Project steward:** [Innovain](https://www.innovain.ai/), a Costa Rican startup, will continue improving Agent Arena. We welcome feature requests, bug reports, scenario ideas, research feedback, and community contributions. Contact us at [info@innovain.com](mailto:info@innovain.com).
 
 ## Mars Arena

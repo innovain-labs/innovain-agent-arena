@@ -437,6 +437,17 @@ export function App() {
               {error}
             </div>
           )}
+          <a
+            className="real-run-callout"
+            href={routeHref('leaderboard')}
+            aria-label="Open the Leaderboard to watch real LLM runs"
+          >
+            <span className="real-run-callout-label">REAL MODEL RUNS</span>
+            <span>Want to see an LLM handle an emergency?</span>
+            <strong>
+              Explore the Leaderboard <ArrowUpRight size={13} />
+            </strong>
+          </a>
           <section className="arena" ref={arenaRef}>
             <MissionPanel
               state={state}
@@ -466,17 +477,6 @@ export function App() {
                   follow={follow}
                 />
               )}
-              <a
-                className="real-run-callout"
-                href={routeHref('leaderboard')}
-                aria-label="Open the Leaderboard to watch real LLM runs"
-              >
-                <span className="real-run-callout-label">REAL MODEL RUNS</span>
-                <span>Want to see an LLM handle an emergency?</span>
-                <strong>
-                  Explore the Leaderboard <ArrowUpRight size={13} />
-                </strong>
-              </a>
               <div className="view-controls">
                 <button
                   aria-label={follow ? 'Disable cinematic camera' : 'Enable cinematic camera'}

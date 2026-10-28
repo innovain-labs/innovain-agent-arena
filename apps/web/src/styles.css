@@ -530,20 +530,20 @@ h2 {
   color: #d9bea0;
 }
 .real-run-callout {
-  position: absolute;
-  top: 48px;
-  left: 16px;
-  z-index: 4;
   display: grid;
-  gap: 5px;
-  max-width: min(270px, calc(100% - 66px));
-  padding: 9px 11px;
+  grid-template-columns: max-content minmax(0, 1fr) max-content;
+  align-items: center;
+  gap: 8px 16px;
+  width: 100%;
+  margin: 0 0 12px;
+  padding: 10px 14px;
   border: 1px solid #8cc6c477;
-  background: #151e1ddf;
+  border-left: 2px solid #ff9467;
+  background: linear-gradient(100deg, #1c2927, #151e1df2 72%);
   box-shadow: 0 5px 16px #17120f55;
   color: #d1ded1;
   text-decoration: none;
-  font-size: 9px;
+  font-size: 10px;
   line-height: 1.35;
   transition:
     border-color 150ms ease,
@@ -563,14 +563,17 @@ h2 {
   color: #82c8bd;
   font: 7px var(--mono);
   letter-spacing: 0.8px;
+  white-space: nowrap;
 }
 .real-run-callout strong {
   display: flex;
+  justify-self: end;
   align-items: center;
   gap: 5px;
   color: #ff9a6e;
   font: 8px var(--mono);
   letter-spacing: 0.25px;
+  white-space: nowrap;
 }
 .coordinates {
   letter-spacing: 1px;
@@ -1581,6 +1584,22 @@ h2 {
   .world-view {
     height: 390px;
     border-top: 1px solid #755c3f;
+  }
+  .real-run-callout {
+    grid-template-columns: minmax(0, 1fr) max-content;
+    gap: 4px 10px;
+    margin-bottom: 10px;
+    padding: 8px 10px;
+  }
+  .real-run-callout-label {
+    grid-column: 1 / -1;
+    font-size: 6px;
+  }
+  .real-run-callout > span:nth-child(2) {
+    font-size: 9px;
+  }
+  .real-run-callout strong {
+    font-size: 7px;
   }
   .activity-panel {
     height: 210px;

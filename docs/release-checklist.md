@@ -21,12 +21,13 @@ Review the existing private repository, confirm its organization remote and bran
 
 ## Innovain launch gate
 
-- Keep the GitHub repository private while the demo uses the Azure default hostname.
-- Configure `arena.innovain.ai`, bind HTTPS, and verify the custom hostname from a clean browser before making the repository public.
+- Keep the GitHub repository private until the owner authorizes the public-source launch.
+- Before launch, verify that `arena.innovain.ai` is bound to the Azure App Service, HTTPS is healthy, the canonical and social metadata use the custom hostname, the social image loads, and the site works in a clean browser. The custom hostname, HTTPS, and metadata have already been deployed and smoke-checked; repeat the concise check against the exact release build.
 - Confirm `info@innovain.com` is monitored for confidential vulnerability reports before public release. Immediately after changing repository visibility to public, enable GitHub private vulnerability reporting and verify the Report a vulnerability channel; GitHub currently offers this feature for public repositories.
 - Confirm the exact `main` commit has a green CI run before public release.
+- Protect `main` by requiring the `CI / validate` check and blocking force-pushes and branch deletion. GitHub currently warns that classic protection rules will not be enforced for this private repository unless the organization upgrades to Team or Enterprise; decide whether to upgrade or apply and verify protection immediately after the repository becomes public.
 - Keep `VITE_PUBLIC_REPOSITORY_URL` unset while the GitHub repository is private. Set it to the real repository URL only for the public-source release build.
-- Publish the site's Privacy page and social preview metadata/card with the demo. Update the Open Graph canonical URL and image host to `arena.innovain.ai` when DNS and HTTPS are ready.
+- Publish the site's Privacy page and social preview metadata/card with the demo. Keep the canonical URL and social image host on `arena.innovain.ai`.
 - Stage only reviewed files. Keep incomplete local model evaluation directories out of the release.
 
 ## Optional public demo
