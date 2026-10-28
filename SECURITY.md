@@ -4,9 +4,9 @@ Agent Arena 0.1 is an experimental fictional simulator. Provider requests run lo
 
 ## Reporting
 
-While the repository is private, report security vulnerabilities confidentially to [info@innovain.com](mailto:info@innovain.com) with the affected version, reproduction steps using placeholder credentials, impact, and suggested mitigation. Do not publish credentials or exploit details in public issues.
+Report security vulnerabilities confidentially to [info@innovain.com](mailto:info@innovain.com), which is monitored by Innovain maintainers. Include the affected version, reproduction steps using placeholder credentials, impact, and suggested mitigation. Do not publish credentials or exploit details in public issues.
 
-Before public launch, maintainers must confirm that this mailbox is monitored. After the repository becomes public, enable GitHub's private vulnerability reporting and verify that the Security → Report a vulnerability channel is available. GitHub's private reporting is enabled for public repositories. Routine UI bugs belong in ordinary issues.
+Before public launch, ensure the mailbox remains monitored. After the repository becomes public, enable GitHub's private vulnerability reporting and verify that the Security → Report a vulnerability channel is available. GitHub's private reporting is enabled for public repositories. Routine UI bugs belong in ordinary issues.
 
 Reports should identify the affected version, reproduction steps with placeholder credentials, impact, and suggested mitigation. Routine UI bugs belong in ordinary issues.
 
